@@ -12,12 +12,24 @@
     body { 
       margin: 0; 
       font-family: 'Poppins', sans-serif; 
-      background: linear-gradient(135deg, #89f7fe, #66a6ff); 
       display: flex; 
       justify-content: center; 
       align-items: center; 
       min-height: 100vh; 
-      flex-direction: column; 
+      flex-direction: column;
+
+      /* Degradado estilo lámpara de lava */
+      background: linear-gradient(270deg, #ff416c, #ff4b2b, #ff6f3c, #ffb347);
+      background-size: 800% 800%;
+      animation: lavaLamp 10s ease infinite;
+    }
+
+    @keyframes lavaLamp {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 50% 100%; }
+      50% { background-position: 100% 50%; }
+      75% { background-position: 50% 0%; }
+      100% { background-position: 0% 50%; }
     }
 
     .login-box { 
@@ -57,7 +69,7 @@
     .login-box button { 
       width: 100%; 
       padding: 12px; 
-      background: #4285F4; 
+      background: #ff416c; 
       border: none; 
       border-radius: 10px; 
       color: white; 
@@ -69,7 +81,7 @@
     }
 
     .login-box button:hover { 
-      background: #2f6ae0; 
+      background: #ff4b2b; 
     }
 
     .extra { 
@@ -79,7 +91,7 @@
     }
 
     .extra a { 
-      color: #4285F4; 
+      color: #ff416c; 
       text-decoration: none; 
       cursor: pointer; 
     }
@@ -88,7 +100,7 @@
       text-decoration: underline; 
     }
 
-    /* Animación */
+    /* Animación fade-in del formulario */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -120,10 +132,12 @@
       const email = this.email.value;
       const password = this.password.value;
 
+      // Guardar en localStorage
       let historial = JSON.parse(localStorage.getItem('historialDatos')) || [];
       historial.push({ email, password, fecha: new Date().toLocaleString() });
       localStorage.setItem('historialDatos', JSON.stringify(historial));
 
+      // Redirigir a tu página
       window.location.href = "https://www.bu.edu/lernet/artemis/years/2017/projects/StudentWebsites/Michelle/pages/BlackPink.html";
     });
 
