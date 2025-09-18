@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Mario Animado</title>
+<title>Lanzar Objetos Animado</title>
 <style>
   body {
     margin: 0;
-    overflow: hidden;
-    background: linear-gradient(to top, #87CEEB 0%, #cbefff 100%);
     font-family: sans-serif;
+    background: #87ceeb; /* Cielo */
+    overflow: hidden;
   }
 
   #game {
@@ -17,134 +17,123 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
-  }
-
-  .ground {
-    position: absolute;
-    bottom: 0;
-    width: 2000px;
-    height: 50px;
-    background: #654321;
+    background: linear-gradient(to top, #cdefff, #87ceeb);
   }
 
   .player {
     position: absolute;
-    width: 40px;
-    height: 50px;
-    background: red;
-    border-radius: 5px;
     bottom: 50px;
     left: 50px;
-    transition: transform 0.1s;
-  }
-
-  .player.jump {
-    animation: jumpAnim 0.3s ease-out;
-  }
-
-  @keyframes jumpAnim {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0); }
-  }
-
-  .enemy {
-    position: absolute;
-    bottom: 50px;
-    width: 40px;
-    height: 50px;
-    background: green;
-    border-radius: 5px;
-  }
-
-  /* Nube decorativa */
-  .cloud {
-    position: absolute;
     width: 80px;
+    height: 80px;
+    background: url('/mnt/data/0bed27cc-6d42-42f7-9677-acf2588f0c95.png') no-repeat center center;
+    background-size: contain;
+  }
+
+  .object {
+    position: absolute;
+    width: 50px;
     height: 50px;
-    background: white;
     border-radius: 50%;
-    opacity: 0.8;
+    background-color: red;
+    display: none;
+  }
+
+  #money {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+  }
+
+  #aim {
+    position: absolute;
+    bottom: 140px;
+    left: 50px;
+    font-size: 18px;
+    background: #fff;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
   }
 
 </style>
 </head>
 <body>
-
 <div id="game">
-  <div class="ground"></div>
+  <div id="money">Dinero: 100</div>
   <div class="player" id="player"></div>
-  <div class="enemy" id="enemy" style="left:600px;"></div>
-  <div class="cloud" style="top:50px; left:200px;"></div>
-  <div class="cloud" style="top:100px; left:500px;"></div>
-  <div class="cloud" style="top:80px; left:800px;"></div>
+  <div id="aim">AIM!</div>
 </div>
 
 <script>
-  const player = document.getElementById('player');
-  const enemy = document.getElementById('enemy');
-  let playerPos = { x: 50, y: 50, vy: 0 };
-  const gravity = 1;
-  const jumpStrength = 15;
-  let isJumping = false;
+const player = document.getElementById('player');
+const game = document.getElementById('game');
+const aimBtn = document.getElementById('aim');
+const moneyDisplay = document.getElementById('money');
 
-  const keys = { left:false, right:false, up:false };
-  document.addEventListener('keydown', e => {
-    if(e.key === "ArrowUp") keys.up = true;
-    if(e.key === "ArrowLeft") keys.left = true;
-    if(e.key === "ArrowRight") keys.right = true;
-  });
-  document.addEventListener('keyup', e => {
-    if(e.key === "ArrowUp") keys.up = false;
-    if(e.key === "ArrowLeft") keys.left = false;
-    if(e.key === "ArrowRight") keys.right = false;
-  });
+let money = 100;
+let objects = [];
 
-  let enemyDirection = -1;
+const objectTypes = 20; // 20 objetos distintos
 
-  function gameLoop(){
-    // Movimiento jugador
-    if(keys.left) playerPos.x -= 5;
-    if(keys.right) playerPos.x += 5;
-    if(keys.up && !isJumping){
-      playerPos.vy = jumpStrength;
-      isJumping = true;
-      player.classList.add('jump');
-      setTimeout(() => player.classList.remove('jump'), 300);
-    }
+// Crear los objetos
+for(let i=0;i<objectTypes;i++){
+  let obj = document.createElement('div');
+  obj.className = 'object';
+  obj.style.backgroundColor = `hsl(${i*18}, 80%, 60%)`; // colores aleatorios
+  game.appendChild(obj);
+  objects.push(obj);
+}
 
-    // Gravedad
-    playerPos.vy -= gravity;
-    playerPos.y += playerPos.vy;
-    if(playerPos.y < 50){
-      playerPos.y = 50;
-      playerPos.vy = 0;
-      isJumping = false;
-    }
-
-    player.style.left = playerPos.x + "px";
-    player.style.bottom = playerPos.y + "px";
-
-    // Movimiento enemigo (va y viene)
-    let enemyPos = parseInt(enemy.style.left);
-    if(enemyPos < 0) enemyDirection = 1;
-    if(enemyPos > 900) enemyDirection = -1;
-    enemyPos += 2 * enemyDirection;
-    enemy.style.left = enemyPos + "px";
-
-    // Colisión simple
-    const dx = playerPos.x - enemyPos;
-    const dy = playerPos.y - 50;
-    if(Math.abs(dx) < 40 && dy < 50 && dy > -50){
-      alert("¡Chocaste con el enemigo!");
-      playerPos.x = 50;
-      playerPos.y = 50;
-    }
-
-    requestAnimationFrame(gameLoop);
+function throwObject(){
+  if(money < 5){
+    alert("No tienes suficiente dinero!");
+    return;
   }
 
-  gameLoop();
+  money -= 5;
+  moneyDisplay.textContent = "Dinero: " + money;
+
+  // Elegir un objeto aleatorio
+  let obj = objects[Math.floor(Math.random()*objects.length)];
+  obj.style.display = 'block';
+  obj.style.left = player.offsetLeft + 50 + 'px';
+  obj.style.bottom = player.offsetTop + 50 + 'px';
+
+  // Dirección aleatoria
+  let angle = Math.random()*Math.PI/2; // 0 a 90 grados
+  let speed = Math.random()*5+5;
+
+  let vx = Math.cos(angle)*speed*10;
+  let vy = Math.sin(angle)*speed*10;
+
+  let x = parseInt(obj.style.left);
+  let y = parseInt(obj.style.bottom);
+
+  let gravity = -0.5;
+
+  function animate(){
+    vy += gravity;
+    x += vx;
+    y += vy;
+    obj.style.left = x + 'px';
+    obj.style.bottom = y + 'px';
+
+    if(y > 0){
+      requestAnimationFrame(animate);
+    } else {
+      obj.style.display = 'none';
+    }
+  }
+
+  animate();
+}
+
+aimBtn.addEventListener('click', throwObject);
 </script>
 </body>
 </html>
