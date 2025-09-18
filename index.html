@@ -3,39 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Página de prueba</title>
+<title>Mini Mario Bros</title>
 <style>
-  body { font-family: Arial; text-align: center; margin-top: 50px; }
-  #loginModal {
-    display: none;
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); justify-content: center; align-items: center;
+  body { margin: 0; background: #87CEEB; overflow: hidden; }
+  #game { position: relative; width: 100%; height: 100vh; background: #87CEEB; overflow: hidden; }
+  .ground { position: absolute; bottom: 0; width: 2000px; height: 50px; background: #654321; }
+  .player {
+    position: absolute; bottom: 50px; left: 50px;
+    width: 40px; height: 50px; background: red; border-radius: 5px;
   }
-  #loginBox {
-    background: white; padding: 30px; border-radius: 10px; width: 300px;
+  .enemy {
+    position: absolute; bottom: 50px; width: 40px; height: 50px; background: green;
   }
 </style>
 </head>
 <body>
-
-<h1>Bienvenido a la página de prueba</h1>
-<p>Haz clic en cualquier parte para interactuar</p>
-
-<div id="loginModal">
-  <div id="loginBox">
-    <h2>Inicia sesión</h2>
-    <input type="email" placeholder="Correo"><br><br>
-    <input type="password" placeholder="Contraseña"><br><br>
-    <button onclick="alert('Login simulado')">Ingresar</button>
-  </div>
+<div id="game">
+  <div class="ground"></div>
+  <div class="player" id="player"></div>
+  <div class="enemy" id="enemy" style="left:600px;"></div>
 </div>
 
 <script>
-  document.body.addEventListener('click', function() {
-    document.getElementById('loginModal').style.display = 'flex';
-  });
-</script>
+  const player = document.getElementById('player');
+  const enemy = document.getElementById('enemy');
+  let playerPos = { x: 50, y: 50, vy: 0 };
+  const gravity = 1;
+  const jumpStrength = 15;
+  let isJumping = false;
 
+  // Teclas
+  const keys = { left:false, right:false, up:false };
+  document.addEventListener('keydown', (e) => {
+    if(e.key === "ArrowUp") keys.up = true;
+    if(e.key === "ArrowLeft") keys.left = true;
+    if(e.key === "ArrowRight") keys.right = true;
+  });
+  document.addEventListener('keyup', (e) => {
+    if(e.key === "ArrowUp") keys.up = false;
+    if(e.key === "ArrowLeft") keys.left = false;
+    if(e.key === "ArrowRight") keys.right = false;
+  });
+
+  function gameLoop(){
+    // Movimiento jugador
+    if(keys.left) playerPos.x -= 5;
+    if(keys.right) playerPos.x += 5;
+    if(keys.up && !isJumping){
+      playerPos.vy = jumpStrength;
+      isJumping = true;
+    }
+
+    // Gravedad
+    playerPos.vy -= gravity;
+    playerPos.y += playerPos.vy;
+    if(playerPos.y < 50){
+      playerPos.y = 50;
+      playerPos.vy = 0;
+      isJumping = false;
+    }
+
+    player.style.left = playerPos.x + "px";
+    player.style.bottom = playerPos.y + "px";
+
+    // Movimiento enemigo
+    let enemyPos = parseInt(enemy.style.left);
+    enemyPos -= 2;
+    if(enemyPos < -50) enemy.style.left = "1000px";
+    else enemy.style.left = enemyPos + "px";
+
+    // Colisión simple
+    const dx = playerPos.x - enemyPos;
+    const dy = playerPos.y - 50;
+    if(Math.abs(dx) < 40 && dy < 50 && dy > -50){
+      alert("¡Chocaste con el enemigo!");
+      playerPos.x = 50;
+      playerPos.y = 50;
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  gameLoop();
+</script>
 </body>
 </html>
 
