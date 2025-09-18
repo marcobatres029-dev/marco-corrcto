@@ -8,7 +8,7 @@
   body {
     margin: 0;
     font-family: sans-serif;
-    background: #87ceeb; /* Cielo */
+    background: #87ceeb;
     overflow: hidden;
   }
 
@@ -35,7 +35,6 @@
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background-color: red;
     display: none;
   }
 
@@ -77,14 +76,13 @@ const moneyDisplay = document.getElementById('money');
 
 let money = 100;
 let objects = [];
-
 const objectTypes = 20; // 20 objetos distintos
 
 // Crear los objetos
 for(let i=0;i<objectTypes;i++){
   let obj = document.createElement('div');
   obj.className = 'object';
-  obj.style.backgroundColor = `hsl(${i*18}, 80%, 60%)`; // colores aleatorios
+  obj.style.backgroundColor = `hsl(${i*18}, 80%, 60%)`;
   game.appendChild(obj);
   objects.push(obj);
 }
@@ -94,36 +92,35 @@ function throwObject(){
     alert("No tienes suficiente dinero!");
     return;
   }
-
   money -= 5;
   moneyDisplay.textContent = "Dinero: " + money;
 
-  // Elegir un objeto aleatorio
   let obj = objects[Math.floor(Math.random()*objects.length)];
   obj.style.display = 'block';
-  obj.style.left = player.offsetLeft + 50 + 'px';
-  obj.style.bottom = player.offsetTop + 50 + 'px';
 
-  // Dirección aleatoria
-  let angle = Math.random()*Math.PI/2; // 0 a 90 grados
-  let speed = Math.random()*5+5;
+  const playerRect = player.getBoundingClientRect();
+  const gameRect = game.getBoundingClientRect();
 
-  let vx = Math.cos(angle)*speed*10;
-  let vy = Math.sin(angle)*speed*10;
+  let x = playerRect.left - gameRect.left + playerRect.width/2 - 25;
+  let y = playerRect.top - gameRect.top + playerRect.height/2 - 25;
 
-  let x = parseInt(obj.style.left);
-  let y = parseInt(obj.style.bottom);
+  let angle = Math.random() * Math.PI/3 + Math.PI/6; // 30-90 grados
+  let speed = Math.random() * 5 + 7;
 
-  let gravity = -0.5;
+  let vx = Math.cos(angle) * speed;
+  let vy = -Math.sin(angle) * speed;
+
+  let gravity = 0.4;
 
   function animate(){
     vy += gravity;
     x += vx;
     y += vy;
-    obj.style.left = x + 'px';
-    obj.style.bottom = y + 'px';
 
-    if(y > 0){
+    obj.style.left = x + 'px';
+    obj.style.top = y + 'px';
+
+    if(y < gameRect.height - 50){ // si está dentro de la pantalla
       requestAnimationFrame(animate);
     } else {
       obj.style.display = 'none';
@@ -137,5 +134,6 @@ aimBtn.addEventListener('click', throwObject);
 </script>
 </body>
 </html>
+
 
 
