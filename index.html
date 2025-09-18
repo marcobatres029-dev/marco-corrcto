@@ -3,25 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mini Mario Bros</title>
+<title>Mini Mario Animado</title>
 <style>
-  body { margin: 0; background: #87CEEB; overflow: hidden; }
-  #game { position: relative; width: 100%; height: 100vh; background: #87CEEB; overflow: hidden; }
-  .ground { position: absolute; bottom: 0; width: 2000px; height: 50px; background: #654321; }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: linear-gradient(to top, #87CEEB 0%, #cbefff 100%);
+    font-family: sans-serif;
+  }
+
+  #game {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .ground {
+    position: absolute;
+    bottom: 0;
+    width: 2000px;
+    height: 50px;
+    background: #654321;
+  }
+
   .player {
-    position: absolute; bottom: 50px; left: 50px;
-    width: 40px; height: 50px; background: red; border-radius: 5px;
+    position: absolute;
+    width: 40px;
+    height: 50px;
+    background: red;
+    border-radius: 5px;
+    bottom: 50px;
+    left: 50px;
+    transition: transform 0.1s;
   }
+
+  .player.jump {
+    animation: jumpAnim 0.3s ease-out;
+  }
+
+  @keyframes jumpAnim {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+  }
+
   .enemy {
-    position: absolute; bottom: 50px; width: 40px; height: 50px; background: green;
+    position: absolute;
+    bottom: 50px;
+    width: 40px;
+    height: 50px;
+    background: green;
+    border-radius: 5px;
   }
+
+  /* Nube decorativa */
+  .cloud {
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0.8;
+  }
+
 </style>
 </head>
 <body>
+
 <div id="game">
   <div class="ground"></div>
   <div class="player" id="player"></div>
   <div class="enemy" id="enemy" style="left:600px;"></div>
+  <div class="cloud" style="top:50px; left:200px;"></div>
+  <div class="cloud" style="top:100px; left:500px;"></div>
+  <div class="cloud" style="top:80px; left:800px;"></div>
 </div>
 
 <script>
@@ -32,18 +88,19 @@
   const jumpStrength = 15;
   let isJumping = false;
 
-  // Teclas
   const keys = { left:false, right:false, up:false };
-  document.addEventListener('keydown', (e) => {
+  document.addEventListener('keydown', e => {
     if(e.key === "ArrowUp") keys.up = true;
     if(e.key === "ArrowLeft") keys.left = true;
     if(e.key === "ArrowRight") keys.right = true;
   });
-  document.addEventListener('keyup', (e) => {
+  document.addEventListener('keyup', e => {
     if(e.key === "ArrowUp") keys.up = false;
     if(e.key === "ArrowLeft") keys.left = false;
     if(e.key === "ArrowRight") keys.right = false;
   });
+
+  let enemyDirection = -1;
 
   function gameLoop(){
     // Movimiento jugador
@@ -52,6 +109,8 @@
     if(keys.up && !isJumping){
       playerPos.vy = jumpStrength;
       isJumping = true;
+      player.classList.add('jump');
+      setTimeout(() => player.classList.remove('jump'), 300);
     }
 
     // Gravedad
@@ -66,11 +125,12 @@
     player.style.left = playerPos.x + "px";
     player.style.bottom = playerPos.y + "px";
 
-    // Movimiento enemigo
+    // Movimiento enemigo (va y viene)
     let enemyPos = parseInt(enemy.style.left);
-    enemyPos -= 2;
-    if(enemyPos < -50) enemy.style.left = "1000px";
-    else enemy.style.left = enemyPos + "px";
+    if(enemyPos < 0) enemyDirection = 1;
+    if(enemyPos > 900) enemyDirection = -1;
+    enemyPos += 2 * enemyDirection;
+    enemy.style.left = enemyPos + "px";
 
     // Colisión simple
     const dx = playerPos.x - enemyPos;
@@ -88,4 +148,5 @@
 </script>
 </body>
 </html>
+
 
