@@ -1,148 +1,331 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lanzar Objetos Bouncemasters</title>
-<style>
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background: #87ceeb;
-    overflow: hidden;
-  }
-
-  #game {
-    position: relative;
-    width: 100%;
-    height: 100vh;
-    background: linear-gradient(to top, #cdefff, #87ceeb);
-    overflow: hidden;
-  }
-
-  .player {
-    position: absolute;
-    bottom: 50px;
-    left: 50px;
-    width: 80px;
-    height: 80px;
-    background: url('/mnt/data/0bed27cc-6d42-42f7-9677-acf2588f0c95.png') no-repeat center center;
-    background-size: contain;
-  }
-
-  .object {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: none;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-  }
-
-  #money {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 20px;
-    font-weight: bold;
-    color: white;
-  }
-
-  #aim {
-    position: absolute;
-    bottom: 140px;
-    left: 50px;
-    font-size: 18px;
-    background: #fff;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    user-select: none;
-  }
-
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Juego: Esquiva los carros</title>
+  <style>
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:#6ec0ff;font-family:Inter,Segoe UI,Arial}
+    .wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:16px}
+    canvas{background:linear-gradient(#7fc9ff 0%, #fff 40%, #a3d9ff 100%);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+    .hud{position:fixed;left:16px;top:16px;color:#fff;font-weight:700;text-shadow:0 2px 6px rgba(0,0,0,0.4)}
+    .credits{position:fixed;right:16px;bottom:16px;color:#fff;font-size:12px}
+    .btn{background:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;border:0;font-weight:700}
+  </style>
 </head>
 <body>
-<div id="game">
-  <div id="money">Dinero: 100</div>
-  <div class="player" id="player"></div>
-  <div id="aim">AIM!</div>
-</div>
+  <div class="wrap">
+    <canvas id="game" width="720" height="900"></canvas>
+  </div>
+  <div class="hud" id="hud">Presiona <strong>Espacio</strong> para iniciar • Flechas / WASD para moverte</div>
+  <div class="credits">Creado por ChatGPT — Pide mejoras o sprites</div>
 
 <script>
-const player = document.getElementById('player');
-const game = document.getElementById('game');
-const aimBtn = document.getElementById('aim');
-const moneyDisplay = document.getElementById('money');
+// Juego: Esquiva los carros
+// Vista: estamos dentro (la parte inferior) y delante se ve una carretera con carros.
+// Objetivo: mover al jugador (persona) para esquivar los carros. Controles: flechas / WASD.
 
-let money = 100;
-let objects = [];
-const objectTypes = 20;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width;
+const H = canvas.height;
 
-// Crear objetos
-for(let i=0;i<objectTypes;i++){
-  let obj = document.createElement('div');
-  obj.className = 'object';
-  obj.style.backgroundColor = `hsl(${i*18}, 80%, 60%)`;
-  game.appendChild(obj);
-  objects.push(obj);
+let keys = {};
+let gameState = 'menu'; // 'menu', 'playing', 'gameover'
+let score = 0;
+let highScore = 0;
+
+// Player (estamos dentro: dibujo de la habitación detrás)
+const player = {
+  x: W/2,
+  y: H - 140,
+  w: 40,
+  h: 64,
+  speed: 6,
+  color: '#ffce54'
+};
+
+// Carros enemigos
+let cars = [];
+let carSpawnTimer = 0;
+let carSpawnInterval = 80; // frames
+let baseCarSpeed = 3;
+
+// Dibuja la "habitación" y la puerta hacia la carretera
+function drawRoom(){
+  // suelo interior
+  const roomHeight = 180;
+  ctx.fillStyle = '#e6d4b8';
+  ctx.fillRect(0, H - roomHeight, W, roomHeight);
+  // alfombra
+  ctx.fillStyle = '#c39c6b';
+  ctx.fillRect(W*0.1, H - roomHeight + 20, W*0.8, roomHeight - 40,);
+  // puerta/puesta que lleva a la carretera
+  const doorW = 260;
+  const doorX = (W-doorW)/2;
+  ctx.fillStyle = '#5a4a3a';
+  ctx.fillRect(doorX, H - roomHeight - 8, doorW, 12); // umbral
+  // marco (paredes)
+  ctx.fillStyle = '#dcdcdc';
+  ctx.fillRect(0, H - roomHeight - 10 - 40, W, 40);
 }
 
-function throwObject(){
-  if(money < 5){
-    alert("No tienes suficiente dinero!");
-    return;
-  }
+// Dibuja la carretera (dos carriles) y el horizonte
+function drawRoad(){
+  // cielo y lejana carretera
+  ctx.fillStyle = '#8fb7ff';
+  ctx.fillRect(0, 0, W, H - 200);
 
-  money -= 5;
-  moneyDisplay.textContent = "Dinero: " + money;
+  // carretera principal (perspectiva simple)
+  const roadTop = 100;
+  const roadBottom = H - 200;
+  // polígonos para simular perspectiva
+  ctx.fillStyle = '#333';
+  ctx.beginPath();
+  ctx.moveTo(W*0.35, roadTop);
+  ctx.lineTo(W*0.65, roadTop);
+  ctx.lineTo(W*0.9, roadBottom);
+  ctx.lineTo(W*0.1, roadBottom);
+  ctx.closePath();
+  ctx.fill();
 
-  let obj = objects[Math.floor(Math.random()*objects.length)];
-  obj.style.display = 'block';
-  obj.style.transform = 'rotate(0deg)';
+  // líneas del centro (separador de carriles)
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 6;
+  ctx.setLineDash([30,20]);
+  ctx.beginPath();
+  ctx.moveTo(W*0.5, roadTop + 10);
+  ctx.lineTo(W*0.5, roadBottom - 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
 
-  const playerRect = player.getBoundingClientRect();
-  const gameRect = game.getBoundingClientRect();
-
-  let x = playerRect.left - gameRect.left + playerRect.width/2 - 25;
-  let y = playerRect.top - gameRect.top + playerRect.height/2 - 25;
-
-  let angle = Math.random() * Math.PI/3 + Math.PI/6; // 30-90 grados
-  let speed = Math.random() * 6 + 8;
-
-  let vx = Math.cos(angle) * speed;
-  let vy = -Math.sin(angle) * speed;
-
-  const gravity = 0.5;
-  const friction = 0.7; // pérdida de energía al rebotar
-
-  function animate(){
-    vy += gravity;
-    x += vx;
-    y += vy;
-
-    if(y + 50 > gameRect.height){ // colisión con suelo
-      y = gameRect.height - 50;
-      vy *= -friction;
-      vx *= friction;
-    }
-
-    if(Math.abs(vy) < 1 && y + 50 >= gameRect.height){ 
-      obj.style.display = 'none';
-      return; // detener animación
-    }
-
-    obj.style.left = x + 'px';
-    obj.style.top = y + 'px';
-    obj.style.transform = `rotate(${x + y}deg)`; // efecto rotación divertido
-
-    requestAnimationFrame(animate);
-  }
-
-  animate();
+  // orillas
+  ctx.fillStyle = '#6b6b6b';
+  ctx.fillRect(0, roadBottom, W, 200); // pasto/immediate ground
 }
 
-aimBtn.addEventListener('click', throwObject);
+function drawPlayer(){
+  // cuerpo
+  ctx.fillStyle = player.color;
+  roundRect(ctx, player.x - player.w/2, player.y - player.h, player.w, player.h, 8, true, false);
+  // cabeza
+  ctx.fillStyle = '#f8d6c0';
+  ctx.beginPath();
+  ctx.arc(player.x, player.y - player.h - 12, 12, 0, Math.PI*2);
+  ctx.fill();
+}
+
+function roundRect(ctx, x, y, w, h, r, fill, stroke){
+  if (typeof r === 'undefined') r = 5;
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+  if(fill) ctx.fill();
+  if(stroke) ctx.stroke();
+}
+
+function spawnCar(){
+  // Elegir x dentro de la porción de carretera (interpolate top to bottom)
+  const laneLeft = W*0.2;
+  const laneRight = W*0.8;
+  // spawn en Y por encima de la pantalla con un offset para perspectiva
+  const y = -120;
+  const x = lerp(W*0.5 - 160*Math.random(), W*0.5 + 160*Math.random(), 1);
+  const w = 60 + Math.random()*30;
+  const h = 120 + Math.random()*20;
+  const speed = baseCarSpeed + Math.random()*2;
+  const color = pick(['#ff6b6b','#6bc1ff','#ffd166','#9b5de5','#00c851']);
+  cars.push({x,y,w,h,speed,color});
+}
+
+function update(){
+  if(gameState === 'playing'){
+    // entrada
+    if((keys.ArrowLeft || keys.a) && player.x - player.w/2 > 40) player.x -= player.speed;
+    if((keys.ArrowRight || keys.d) && player.x + player.w/2 < W-40) player.x += player.speed;
+    if((keys.ArrowUp || keys.w) && player.y - player.h > 60) player.y -= player.speed;
+    if((keys.ArrowDown || keys.s) && player.y < H - 60) player.y += player.speed;
+
+    // ajustar dificultad por score
+    baseCarSpeed = 3 + Math.floor(score/10)*0.4;
+    carSpawnInterval = Math.max(30, 80 - Math.floor(score/5));
+
+    // spawnear carros
+    carSpawnTimer++;
+    if(carSpawnTimer >= carSpawnInterval){
+      spawnCar();
+      carSpawnTimer = 0;
+    }
+
+    // mover carros
+    for(let i=cars.length-1;i>=0;i--){
+      const c = cars[i];
+      // aplicar perspectiva: velocidad aumenta hacia abajo
+      c.y += c.speed + mapRange(c.y, -200, H, 0, 6);
+      // escalar ancho por perspectiva
+      const scale = 1 + mapRange(c.y, -200, H, -0.3, 0.8);
+      c.drawW = c.w * scale;
+      c.drawH = c.h * scale;
+      c.drawX = c.x - c.drawW/2;
+
+      // colisión simple AABB con jugador
+      const px = player.x - player.w/2;
+      const py = player.y - player.h;
+      const pw = player.w;
+      const ph = player.h + 12;
+      const cx = c.drawX;
+      const cy = c.y - c.drawH/2;
+      const cw = c.drawW;
+      const ch = c.drawH;
+      if(rectIntersect(px,py,pw,ph,cx,cy,cw,ch)){
+        gameOver();
+      }
+
+      // si sale de pantalla, eliminar y sumar puntaje
+      if(c.y - c.drawH/2 > H + 60){
+        cars.splice(i,1);
+        score += 1;
+      }
+    }
+  }
+}
+
+function draw(){
+  // fondo cielo
+  ctx.clearRect(0,0,W,H);
+  drawRoad();
+  // dibujar autos lejanos para profundidad
+  drawDistantCars();
+
+  // dibujar puerta/umbral y la habitación
+  drawRoom();
+
+  // dibujar jugador
+  drawPlayer();
+
+  // dibujar carros en orden
+  for(const c of cars){
+    drawCar(c);
+  }
+
+  // HUD
+  ctx.fillStyle = 'white';
+  ctx.font = '20px monospace';
+  ctx.fillText(`Puntaje: ${score}`, 18, 34);
+  ctx.fillText(`Mejor: ${highScore}`, 18, 62);
+
+  if(gameState === 'menu'){
+    drawMenu();
+  }
+  if(gameState === 'gameover'){
+    drawGameOver();
+  }
+}
+
+function drawCar(c){
+  ctx.save();
+  ctx.translate(c.drawX + c.drawW/2, c.y);
+  // carro como rectángulo
+  ctx.fillStyle = c.color;
+  roundRect(ctx, -c.drawW/2, -c.drawH/2, c.drawW, c.drawH*0.7, 8, true, false);
+  // ventanas
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  ctx.fillRect(-c.drawW*0.2, -c.drawH*0.3, c.drawW*0.4, c.drawH*0.28);
+  // ruedas
+  ctx.fillStyle = '#222';
+  const rw = Math.max(8, c.drawW*0.16);
+  ctx.beginPath(); ctx.arc(-c.drawW*0.28, c.drawH*0.26, rw,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(c.drawW*0.28, c.drawH*0.26, rw,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawDistantCars(){
+  // solo decoración: pequeños rectángulos en el horizonte
+  for(let i=0;i<6;i++){
+    const x = W*0.2 + i*(W*0.1) + (i%2?10:-10);
+    const y = 120 + (i%3)*8;
+    ctx.fillStyle = '#444';
+    ctx.fillRect(x, y, 30, 12);
+  }
+}
+
+function drawMenu(){
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(W*0.12, H*0.2, W*0.76, H*0.5);
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 36px sans-serif';
+  ctx.fillText('ESQUIVA LOS CARROS', W*0.22, H*0.3);
+  ctx.font = '18px sans-serif';
+  ctx.fillText('Presiona ESPACIO para comenzar', W*0.24, H*0.36);
+  ctx.fillText('Usa Flechas / WASD para moverte', W*0.24, H*0.42);
+}
+
+function drawGameOver(){
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(W*0.12, H*0.28, W*0.76, H*0.36);
+  ctx.fillStyle = '#ffdddd';
+  ctx.font = 'bold 34px monospace';
+  ctx.fillText('GAME OVER', W*0.32, H*0.42);
+  ctx.fillStyle = '#fff';
+  ctx.font = '18px monospace';
+  ctx.fillText(`Puntaje final: ${score}`, W*0.33, H*0.49);
+  ctx.fillText('Presiona ESPACIO para reiniciar', W*0.27, H*0.57);
+}
+
+function gameOver(){
+  gameState = 'gameover';
+  highScore = Math.max(highScore, score);
+}
+
+function restart(){
+  cars = [];
+  carSpawnTimer = 0;
+  score = 0;
+  player.x = W/2;
+  player.y = H - 140;
+  gameState = 'playing';
+}
+
+// util
+function lerp(a,b,t){return a + (b-a)*t}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+function mapRange(v, a, b, A, B){return A + (v-a)*(B-A)/(b-a)}
+function rectIntersect(x1,y1,w1,h1,x2,y2,w2,h2){
+  return !(x2 > x1 + w1 || x2 + w2 < x1 || y2 > y1 + h1 || y2 + h2 < y1);
+}
+
+// input
+window.addEventListener('keydown', e=>{
+  keys[e.key] = true;
+  if(e.key === ' '){
+    if(gameState === 'menu') restart();
+    else if(gameState === 'gameover') restart();
+  }
+});
+window.addEventListener('keyup', e=>{keys[e.key] = false});
+
+// touch support simple: tocar lado izquierdo/derecho
+canvas.addEventListener('touchstart', e=>{
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  const x = (t.clientX - rect.left) * (canvas.width/rect.width);
+  if(x < W/2) keys.ArrowLeft = true; else keys.ArrowRight = true;
+});
+canvas.addEventListener('touchend', e=>{keys.ArrowLeft = false; keys.ArrowRight = false});
+
+// loop
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+loop();
 </script>
 </body>
 </html>
