@@ -3,329 +3,304 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Juego: Esquiva los carros</title>
+  <title>Juego: Asalto a la casa (3 pisos)</title>
   <style>
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:#6ec0ff;font-family:Inter,Segoe UI,Arial}
-    .wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:16px}
-    canvas{background:linear-gradient(#7fc9ff 0%, #fff 40%, #a3d9ff 100%);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
-    .hud{position:fixed;left:16px;top:16px;color:#fff;font-weight:700;text-shadow:0 2px 6px rgba(0,0,0,0.4)}
-    .credits{position:fixed;right:16px;bottom:16px;color:#fff;font-size:12px}
-    .btn{background:#fff;padding:8px 12px;border-radius:8px;cursor:pointer;border:0;font-weight:700}
+    html,body{height:100%;margin:0;background:#111;color:#fff;font-family:Inter,Segoe UI,Arial}
+    #wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:12px}
+    canvas{background:#233;background-image:linear-gradient(#6a8fb6 0%, #233 60%);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    .hud{position:fixed;left:16px;top:16px;color:#fff;font-weight:700;text-shadow:0 2px 6px rgba(0,0,0,0.6)}
+    .controls{position:fixed;right:16px;top:16px;color:#fff;font-size:13px;opacity:0.9}
+    .credits{position:fixed;right:16px;bottom:16px;color:#ddd;font-size:12px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <canvas id="game" width="720" height="900"></canvas>
-  </div>
-  <div class="hud" id="hud">Presiona <strong>Espacio</strong> para iniciar • Flechas / WASD para moverte</div>
-  <div class="credits">Creado por ChatGPT — Pide mejoras o sprites</div>
-
+<div id="wrap"><canvas id="game" width="900" height="640"></canvas></div>
+<div class="hud" id="hud">Salud: 100 • Enemigos: 0 • Piso: 1</div>
+<div class="controls">Mover: WASD o Flechas • Apuntar: Ratón • Disparar: Click/Espacio • Subir/Bajar: E/Q</div>
+<div class="credits">Creado por ChatGPT — Pide mejoras: enemigos, IA, sprites</div>
 <script>
-// Juego: Esquiva los carros
-// Vista: estamos dentro (la parte inferior) y delante se ve una carretera con carros.
-// Objetivo: mover al jugador (persona) para esquivar los carros. Controles: flechas / WASD.
+// Juego: Asalto a una casa de 3 pisos.
+// Mecánicas: Mover, apuntar con ratón, disparar, subir/bajar pisos por escaleras, enemigos patrullan y disparan.
+// Objetivo: eliminar a todos los enemigos en la casa.
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
-const W = canvas.width;
-const H = canvas.height;
-
+const W = canvas.width, H = canvas.height;
 let keys = {};
-let gameState = 'menu'; // 'menu', 'playing', 'gameover'
-let score = 0;
-let highScore = 0;
+let mouse = {x:0,y:0,down:false};
 
-// Player (estamos dentro: dibujo de la habitación detrás)
+// Game state
+let gameState = 'playing';
+let score = 0;
+
+// House layout: 3 pisos, cada piso es una franja horizontal
+const floors = 3;
+const floorHeight = Math.floor(H / floors); // from top (floor 3 at top?) We'll number 1 bottom to 3 top
+
+// Player
 const player = {
   x: W/2,
-  y: H - 140,
-  w: 40,
-  h: 64,
-  speed: 6,
-  color: '#ffce54'
+  y: H - floorHeight/2,
+  w: 26,
+  h: 36,
+  speed: 3.8,
+  health: 100,
+  reload: 0,
+  fireRate: 10, // frames
+  dmg: 20,
+  facing: 0,
+  floor: 1
 };
 
-// Carros enemigos
-let cars = [];
-let carSpawnTimer = 0;
-let carSpawnInterval = 80; // frames
-let baseCarSpeed = 3;
+// Enemies array
+let enemies = [];
+let enemyId = 0;
 
-// Dibuja la "habitación" y la puerta hacia la carretera
-function drawRoom(){
-  // suelo interior
-  const roomHeight = 180;
-  ctx.fillStyle = '#e6d4b8';
-  ctx.fillRect(0, H - roomHeight, W, roomHeight);
-  // alfombra
-  ctx.fillStyle = '#c39c6b';
-  ctx.fillRect(W*0.1, H - roomHeight + 20, W*0.8, roomHeight - 40,);
-  // puerta/puesta que lleva a la carretera
-  const doorW = 260;
-  const doorX = (W-doorW)/2;
-  ctx.fillStyle = '#5a4a3a';
-  ctx.fillRect(doorX, H - roomHeight - 8, doorW, 12); // umbral
-  // marco (paredes)
-  ctx.fillStyle = '#dcdcdc';
-  ctx.fillRect(0, H - roomHeight - 10 - 40, W, 40);
+// Bullets
+let bullets = [];
+
+// Stair positions (x coordinates where you can change floors)
+const stairs = [
+  {x:80,yFloors:[H - floorHeight + 30, H - floorHeight - floorHeight + 30, H - floorHeight - floorHeight*2 + 30]},
+  {x:W - 120,yFloors:[H - floorHeight + 30, H - floorHeight - floorHeight + 30, H - floorHeight - floorHeight*2 + 30]}
+];
+
+// Spawn enemies per floor
+function initEnemies(){
+  enemies = [];
+  enemyId = 0;
+  const countPerFloor = [3,4,5]; // bottom to top
+  for(let f=1; f<=3; f++){
+    for(let i=0;i<countPerFloor[f-1];i++){
+      spawnEnemy(f);
+    }
+  }
 }
 
-// Dibuja la carretera (dos carriles) y el horizonte
-function drawRoad(){
-  // cielo y lejana carretera
-  ctx.fillStyle = '#8fb7ff';
-  ctx.fillRect(0, 0, W, H - 200);
-
-  // carretera principal (perspectiva simple)
-  const roadTop = 100;
-  const roadBottom = H - 200;
-  // polígonos para simular perspectiva
-  ctx.fillStyle = '#333';
-  ctx.beginPath();
-  ctx.moveTo(W*0.35, roadTop);
-  ctx.lineTo(W*0.65, roadTop);
-  ctx.lineTo(W*0.9, roadBottom);
-  ctx.lineTo(W*0.1, roadBottom);
-  ctx.closePath();
-  ctx.fill();
-
-  // líneas del centro (separador de carriles)
-  ctx.strokeStyle = '#fff';
-  ctx.lineWidth = 6;
-  ctx.setLineDash([30,20]);
-  ctx.beginPath();
-  ctx.moveTo(W*0.5, roadTop + 10);
-  ctx.lineTo(W*0.5, roadBottom - 20);
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // orillas
-  ctx.fillStyle = '#6b6b6b';
-  ctx.fillRect(0, roadBottom, W, 200); // pasto/immediate ground
+function spawnEnemy(floor){
+  const margin = 140;
+  const yCenter = H - floorHeight*floor + floorHeight/2;
+  const x = margin + Math.random()*(W - margin*2);
+  const y = yCenter + (Math.random()-0.5)*20;
+  const speed = 1 + Math.random()*1.2;
+  const hp = 40 + Math.floor(Math.random()*30);
+  enemies.push({id:enemyId++, x,y,w:26,h:34, floor, speed, hp, maxhp:hp, dir: Math.random()<0.5? -1:1, patrolRange:100 + Math.random()*120, baseX:x, shootTimer: 60 + Math.random()*80});
 }
 
-function drawPlayer(){
-  // cuerpo
-  ctx.fillStyle = player.color;
-  roundRect(ctx, player.x - player.w/2, player.y - player.h, player.w, player.h, 8, true, false);
-  // cabeza
-  ctx.fillStyle = '#f8d6c0';
-  ctx.beginPath();
-  ctx.arc(player.x, player.y - player.h - 12, 12, 0, Math.PI*2);
-  ctx.fill();
+// Input
+window.addEventListener('keydown', e=>{keys[e.key.toLowerCase()] = true; if(e.key===' '){mouse.down = true;} });
+window.addEventListener('keyup', e=>{keys[e.key.toLowerCase()] = false; if(e.key===' '){mouse.down = false;} });
+canvas.addEventListener('mousemove', e=>{const r=canvas.getBoundingClientRect(); mouse.x=(e.clientX-r.left)*(canvas.width/r.width); mouse.y=(e.clientY-r.top)*(canvas.height/r.height);});
+canvas.addEventListener('mousedown', e=>{mouse.down = true;});
+canvas.addEventListener('mouseup', e=>{mouse.down = false;});
+canvas.addEventListener('touchstart', e=>{const t=e.touches[0];const r=canvas.getBoundingClientRect(); mouse.x=(t.clientX-r.left)*(canvas.width/r.width); mouse.y=(t.clientY-r.top)*(canvas.height/r.height); mouse.down=true;});
+canvas.addEventListener('touchmove', e=>{const t=e.touches[0];const r=canvas.getBoundingClientRect(); mouse.x=(t.clientX-r.left)*(canvas.width/r.width); mouse.y=(t.clientY-r.top)*(canvas.height/r.height);});
+canvas.addEventListener('touchend', e=>{mouse.down=false;});
+
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+// Shooting
+function fireBullet(x,y,tx,ty,owner){
+  const dx = tx - x; const dy = ty - y; const mag = Math.hypot(dx,dy); if(mag===0) return;
+  const vx = dx/mag*8; const vy = dy/mag*8;
+  bullets.push({x,y,vx,vy,owner,life:120});
 }
 
-function roundRect(ctx, x, y, w, h, r, fill, stroke){
-  if (typeof r === 'undefined') r = 5;
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-  if(fill) ctx.fill();
-  if(stroke) ctx.stroke();
-}
-
-function spawnCar(){
-  // Elegir x dentro de la porción de carretera (interpolate top to bottom)
-  const laneLeft = W*0.2;
-  const laneRight = W*0.8;
-  // spawn en Y por encima de la pantalla con un offset para perspectiva
-  const y = -120;
-  const x = lerp(W*0.5 - 160*Math.random(), W*0.5 + 160*Math.random(), 1);
-  const w = 60 + Math.random()*30;
-  const h = 120 + Math.random()*20;
-  const speed = baseCarSpeed + Math.random()*2;
-  const color = pick(['#ff6b6b','#6bc1ff','#ffd166','#9b5de5','#00c851']);
-  cars.push({x,y,w,h,speed,color});
-}
-
+// Update
 function update(){
-  if(gameState === 'playing'){
-    // entrada
-    if((keys.ArrowLeft || keys.a) && player.x - player.w/2 > 40) player.x -= player.speed;
-    if((keys.ArrowRight || keys.d) && player.x + player.w/2 < W-40) player.x += player.speed;
-    if((keys.ArrowUp || keys.w) && player.y - player.h > 60) player.y -= player.speed;
-    if((keys.ArrowDown || keys.s) && player.y < H - 60) player.y += player.speed;
+  if(gameState !== 'playing') return;
 
-    // ajustar dificultad por score
-    baseCarSpeed = 3 + Math.floor(score/10)*0.4;
-    carSpawnInterval = Math.max(30, 80 - Math.floor(score/5));
+  // player movement
+  const onFloorY = (f)=> H - floorHeight*f + floorHeight/2;
+  let moveX = 0, moveY = 0;
+  if(keys['arrowleft']||keys['a']) moveX = -1;
+  if(keys['arrowright']||keys['d']) moveX = 1;
+  if(keys['arrowup']||keys['w']) moveY = -1;
+  if(keys['arrowdown']||keys['s']) moveY = 1;
+  player.x += moveX * player.speed;
+  player.x = clamp(player.x, 30, W-30);
+  // Allow small vertical adjust inside floor
+  player.y += moveY * player.speed;
+  const targetY = onFloorY(player.floor) + (floorHeight/2 - player.h/2) - 20;
+  player.y = clamp(player.y, targetY - 20, targetY + 20);
 
-    // spawnear carros
-    carSpawnTimer++;
-    if(carSpawnTimer >= carSpawnInterval){
-      spawnCar();
-      carSpawnTimer = 0;
+  // change floors: E subir, Q bajar
+  if(keys['e']){ // subir si cerca de escalera and not top
+    for(const s of stairs){
+      const sx = s.x; const sy = s.yFloors[player.floor-1];
+      if(Math.abs(player.x - sx) < 36){ if(player.floor < 3){ player.floor++; player.y = onFloorY(player.floor); } }
     }
+    keys['e'] = false; // prevent repeat
+  }
+  if(keys['q']){ // bajar
+    for(const s of stairs){
+      const sx = s.x; const sy = s.yFloors[player.floor-1];
+      if(Math.abs(player.x - sx) < 36){ if(player.floor > 1){ player.floor--; player.y = onFloorY(player.floor); } }
+    }
+    keys['q'] = false;
+  }
 
-    // mover carros
-    for(let i=cars.length-1;i>=0;i--){
-      const c = cars[i];
-      // aplicar perspectiva: velocidad aumenta hacia abajo
-      c.y += c.speed + mapRange(c.y, -200, H, 0, 6);
-      // escalar ancho por perspectiva
-      const scale = 1 + mapRange(c.y, -200, H, -0.3, 0.8);
-      c.drawW = c.w * scale;
-      c.drawH = c.h * scale;
-      c.drawX = c.x - c.drawW/2;
+  // aim
+  player.facing = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
-      // colisión simple AABB con jugador
-      const px = player.x - player.w/2;
-      const py = player.y - player.h;
-      const pw = player.w;
-      const ph = player.h + 12;
-      const cx = c.drawX;
-      const cy = c.y - c.drawH/2;
-      const cw = c.drawW;
-      const ch = c.drawH;
-      if(rectIntersect(px,py,pw,ph,cx,cy,cw,ch)){
-        gameOver();
+  // firing
+  if(player.reload > 0) player.reload--; 
+  if(mouse.down && player.reload === 0){ fireBullet(player.x, player.y - player.h/2, mouse.x, mouse.y, 'player'); player.reload = player.fireRate; }
+
+  // update bullets
+  for(let i=bullets.length-1;i>=0;i--){
+    const b = bullets[i];
+    b.x += b.vx; b.y += b.vy; b.life--;
+    // bounds
+    if(b.x < -50 || b.x>W+50 || b.y<-50 || b.y>H+50 || b.life<=0){ bullets.splice(i,1); continue; }
+    // collisions: if owner player, hit enemies same floor
+    if(b.owner==='player'){
+      for(let j=enemies.length-1;j>=0;j--){ const e=enemies[j]; if(e.floor !== player.floor) continue;
+        if(pointInRect(b.x,b.y,e.x - e.w/2, e.y - e.h/2, e.w, e.h)){
+          e.hp -= player.dmg; bullets.splice(i,1); if(e.hp<=0){ enemies.splice(j,1); score++; } break;
+        }
       }
-
-      // si sale de pantalla, eliminar y sumar puntaje
-      if(c.y - c.drawH/2 > H + 60){
-        cars.splice(i,1);
-        score += 1;
+    } else { // enemy bullet hits player if same floor
+      if(b.owner && b.owner.type === 'enemy' && b.owner.floor === player.floor){
+        if(pointInRect(b.x,b.y, player.x - player.w/2, player.y - player.h, player.w, player.h + 12)){
+          player.health -= 12; bullets.splice(i,1);
+          if(player.health <=0) gameState='dead';
+        }
       }
     }
   }
+
+  // update enemies
+  for(const e of enemies){
+    // simple patrol
+    e.baseX += 0; // base static
+    e.x += e.dir * e.speed;
+    if(Math.abs(e.x - e.baseX) > e.patrolRange) e.dir *= -1;
+    // clamp inside margins
+    e.x = clamp(e.x, 40, W-40);
+
+    // line of sight: if player on same floor and within X, aim and shoot occasionally
+    e.shootTimer--;
+    if(e.floor === player.floor){
+      const dx = player.x - e.x; const dy = player.y - e.y; const dist = Math.hypot(dx,dy);
+      if(dist < 380){
+        if(e.shootTimer <=0){
+          // fire
+          const angle = Math.atan2(player.y - e.y, player.x - e.x);
+          bullets.push({x:e.x, y:e.y, vx:Math.cos(angle)*5, vy:Math.sin(angle)*5, owner:{type:'enemy',id:e.id, floor:e.floor}, life:160});
+          e.shootTimer = 80 + Math.random()*80;
+        }
+      }
+    }
+  }
+
+  // update HUD
+  document.getElementById('hud').innerText = `Salud: ${Math.max(0,Math.round(player.health))} • Enemigos: ${enemies.length} • Piso: ${player.floor}`;
+
+  // win/lose checks
+  if(enemies.length === 0){ gameState = 'win'; }
 }
 
+function pointInRect(px,py,rx,ry,rw,rh){return px>=rx && px<=rx+rw && py>=ry && py<=ry+rh;}
+
+// Draw
 function draw(){
-  // fondo cielo
+  // clear
   ctx.clearRect(0,0,W,H);
-  drawRoad();
-  // dibujar autos lejanos para profundidad
-  drawDistantCars();
 
-  // dibujar puerta/umbral y la habitación
-  drawRoom();
-
-  // dibujar jugador
-  drawPlayer();
-
-  // dibujar carros en orden
-  for(const c of cars){
-    drawCar(c);
+  // draw floors
+  for(let f=3; f>=1; f--){
+    const top = H - floorHeight*f;
+    // floor background
+    ctx.fillStyle = f===player.floor ? '#2e2e2e' : '#1f1f1f';
+    ctx.fillRect(0, top, W, floorHeight - 2);
+    // windows / decor
+    ctx.fillStyle = '#2a3b4a';
+    ctx.fillRect(10, top+12, 80, 32);
+    // stairs positions
+    ctx.fillStyle = '#6b5a3a';
+    for(const s of stairs){ ctx.fillRect(s.x - 18, top + floorHeight - 80, 36, 80); }
+    // floor label
+    ctx.fillStyle = '#bbb'; ctx.font = '14px monospace'; ctx.fillText('Piso '+f, 14, top + 24);
   }
 
-  // HUD
-  ctx.fillStyle = 'white';
-  ctx.font = '20px monospace';
-  ctx.fillText(`Puntaje: ${score}`, 18, 34);
-  ctx.fillText(`Mejor: ${highScore}`, 18, 62);
-
-  if(gameState === 'menu'){
-    drawMenu();
+  // draw stairs highlights
+  for(const s of stairs){
+    for(let f=1; f<=3; f++){
+      const sy = H - floorHeight*f + floorHeight - 80;
+      ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(s.x - 18, sy, 36, 80);
+    }
   }
-  if(gameState === 'gameover'){
-    drawGameOver();
+
+  // draw player (on its floor)
+  drawEntity(player, true);
+
+  // draw enemies
+  for(const e of enemies){ drawEntity(e, false); drawEnemyHP(e); }
+
+  // bullets
+  for(const b of bullets){ ctx.beginPath(); ctx.arc(b.x,b.y,4,0,Math.PI*2); ctx.fillStyle = '#ffd'; ctx.fill(); }
+
+  // overlays
+  if(gameState === 'win'){
+    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W*0.18, H*0.3, W*0.64, H*0.28);
+    ctx.fillStyle = '#b9ffb9'; ctx.font = '36px monospace'; ctx.fillText('¡Misión cumplida!', W*0.34, H*0.45);
+    ctx.fillStyle = '#fff'; ctx.font = '18px monospace'; ctx.fillText('Presiona R para jugar otra vez', W*0.33, H*0.52);
+  }
+  if(gameState === 'dead'){
+    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W*0.18, H*0.3, W*0.64, H*0.28);
+    ctx.fillStyle = '#ff9a9a'; ctx.font = '36px monospace'; ctx.fillText('Has muerto', W*0.38, H*0.45);
+    ctx.fillStyle = '#fff'; ctx.font = '18px monospace'; ctx.fillText('Presiona R para reiniciar', W*0.33, H*0.52);
   }
 }
 
-function drawCar(c){
+function drawEntity(ent, isPlayer){
+  const top = H - floorHeight*ent.floor;
+  // body
   ctx.save();
-  ctx.translate(c.drawX + c.drawW/2, c.y);
-  // carro como rectángulo
-  ctx.fillStyle = c.color;
-  roundRect(ctx, -c.drawW/2, -c.drawH/2, c.drawW, c.drawH*0.7, 8, true, false);
-  // ventanas
-  ctx.fillStyle = 'rgba(255,255,255,0.9)';
-  ctx.fillRect(-c.drawW*0.2, -c.drawH*0.3, c.drawW*0.4, c.drawH*0.28);
-  // ruedas
-  ctx.fillStyle = '#222';
-  const rw = Math.max(8, c.drawW*0.16);
-  ctx.beginPath(); ctx.arc(-c.drawW*0.28, c.drawH*0.26, rw,0,Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(c.drawW*0.28, c.drawH*0.26, rw,0,Math.PI*2); ctx.fill();
+  ctx.translate(ent.x, ent.y);
+  // shadow
+  ctx.beginPath(); ctx.ellipse(0, ent.h/2 + 6, ent.w*0.6, 6, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fill();
+  // torso
+  ctx.fillStyle = isPlayer ? '#4ea8f7' : '#c7544a';
+  roundRect(ctx, -ent.w/2, -ent.h, ent.w, ent.h, 6, true, false);
+  // head
+  ctx.beginPath(); ctx.arc(0, -ent.h - 8, 10, 0, Math.PI*2); ctx.fillStyle = '#f1d6b3'; ctx.fill();
+  // weapon: simple rectangle rotated for player
+  ctx.save();
+  if(isPlayer){ ctx.rotate(player.facing); ctx.fillStyle = '#222'; ctx.fillRect(8, -ent.h/2 - 4, 18, 6); }
+  else {
+    // enemy aims a bit towards player when same floor
+    const ang = Math.atan2(player.y - ent.y, player.x - ent.x);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#2b2b2b'; ctx.fillRect(8, -ent.h/2 - 4, 16, 6);
+  }
+  ctx.restore();
   ctx.restore();
 }
 
-function drawDistantCars(){
-  // solo decoración: pequeños rectángulos en el horizonte
-  for(let i=0;i<6;i++){
-    const x = W*0.2 + i*(W*0.1) + (i%2?10:-10);
-    const y = 120 + (i%3)*8;
-    ctx.fillStyle = '#444';
-    ctx.fillRect(x, y, 30, 12);
-  }
+function drawEnemyHP(e){
+  const px = e.x - 24, py = e.y - e.h - 22;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(px, py, 48, 8);
+  ctx.fillStyle = '#ff6b6b'; ctx.fillRect(px+1, py+1, Math.max(0,46*(e.hp/e.maxhp)), 6);
 }
 
-function drawMenu(){
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(W*0.12, H*0.2, W*0.76, H*0.5);
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 36px sans-serif';
-  ctx.fillText('ESQUIVA LOS CARROS', W*0.22, H*0.3);
-  ctx.font = '18px sans-serif';
-  ctx.fillText('Presiona ESPACIO para comenzar', W*0.24, H*0.36);
-  ctx.fillText('Usa Flechas / WASD para moverte', W*0.24, H*0.42);
-}
+function roundRect(ctx, x, y, w, h, r, fill, stroke){ if(typeof r==='undefined') r=6; ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); if(fill) ctx.fill(); if(stroke) ctx.stroke(); }
 
-function drawGameOver(){
-  ctx.fillStyle = 'rgba(0,0,0,0.6)';
-  ctx.fillRect(W*0.12, H*0.28, W*0.76, H*0.36);
-  ctx.fillStyle = '#ffdddd';
-  ctx.font = 'bold 34px monospace';
-  ctx.fillText('GAME OVER', W*0.32, H*0.42);
-  ctx.fillStyle = '#fff';
-  ctx.font = '18px monospace';
-  ctx.fillText(`Puntaje final: ${score}`, W*0.33, H*0.49);
-  ctx.fillText('Presiona ESPACIO para reiniciar', W*0.27, H*0.57);
-}
+// reset
+function reset(){ player.x = W/2; player.floor = 1; player.y = H - floorHeight/2; player.health = 100; bullets=[]; initEnemies(); gameState='playing'; score=0; }
 
-function gameOver(){
-  gameState = 'gameover';
-  highScore = Math.max(highScore, score);
-}
+// helper for key R to restart
+window.addEventListener('keydown', e=>{ if(e.key.toLowerCase() === 'r'){ reset(); } });
 
-function restart(){
-  cars = [];
-  carSpawnTimer = 0;
-  score = 0;
-  player.x = W/2;
-  player.y = H - 140;
-  gameState = 'playing';
-}
+// initialize
+initEnemies();
 
-// util
-function lerp(a,b,t){return a + (b-a)*t}
-function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
-function mapRange(v, a, b, A, B){return A + (v-a)*(B-A)/(b-a)}
-function rectIntersect(x1,y1,w1,h1,x2,y2,w2,h2){
-  return !(x2 > x1 + w1 || x2 + w2 < x1 || y2 > y1 + h1 || y2 + h2 < y1);
-}
-
-// input
-window.addEventListener('keydown', e=>{
-  keys[e.key] = true;
-  if(e.key === ' '){
-    if(gameState === 'menu') restart();
-    else if(gameState === 'gameover') restart();
-  }
-});
-window.addEventListener('keyup', e=>{keys[e.key] = false});
-
-// touch support simple: tocar lado izquierdo/derecho
-canvas.addEventListener('touchstart', e=>{
-  const t = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const x = (t.clientX - rect.left) * (canvas.width/rect.width);
-  if(x < W/2) keys.ArrowLeft = true; else keys.ArrowRight = true;
-});
-canvas.addEventListener('touchend', e=>{keys.ArrowLeft = false; keys.ArrowRight = false});
-
-// loop
-function loop(){
-  update();
-  draw();
-  requestAnimationFrame(loop);
-}
-
+// main loop
+function loop(){ update(); draw(); requestAnimationFrame(loop); }
 loop();
+
 </script>
 </body>
 </html>
