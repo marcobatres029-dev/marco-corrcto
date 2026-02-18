@@ -1,307 +1,460 @@
+
 <!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Juego: Asalto a la casa (3 pisos)</title>
-  <style>
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:#111;color:#fff;font-family:Inter,Segoe UI,Arial}
-    #wrap{display:flex;align-items:center;justify-content:center;height:100%;padding:12px}
-    canvas{background:#233;background-image:linear-gradient(#6a8fb6 0%, #233 60%);border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
-    .hud{position:fixed;left:16px;top:16px;color:#fff;font-weight:700;text-shadow:0 2px 6px rgba(0,0,0,0.6)}
-    .controls{position:fixed;right:16px;top:16px;color:#fff;font-size:13px;opacity:0.9}
-    .credits{position:fixed;right:16px;bottom:16px;color:#ddd;font-size:12px}
-  </style>
-</head>
-<body>
-<div id="wrap"><canvas id="game" width="900" height="640"></canvas></div>
-<div class="hud" id="hud">Salud: 100 • Enemigos: 0 • Piso: 1</div>
-<div class="controls">Mover: WASD o Flechas • Apuntar: Ratón • Disparar: Click/Espacio • Subir/Bajar: E/Q</div>
-<div class="credits">Creado por ChatGPT — Pide mejoras: enemigos, IA, sprites</div>
-<script>
-// Juego: Asalto a una casa de 3 pisos.
-// Mecánicas: Mover, apuntar con ratón, disparar, subir/bajar pisos por escaleras, enemigos patrullan y disparan.
-// Objetivo: eliminar a todos los enemigos en la casa.
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Api</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  </head>
+  <body>
+    <!--NAVBAR-->
+    <nav class="navbar navbar-expand-lg fixed-top bg-dark" data-bs-theme="dark">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold" href="#">🕹️Videogames</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-contend-end" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="#news">News</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link " href="#Resenas">Reseñas</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link " aria-current="page" href="#ranking">Top Juegos</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link " aria-current="page" href="#entrevistas">Entrevistas</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link " aria-current="page" href="#suscribete">Suscribite</a>
+                </li>
+                <li class   ="nav-item">
+                <a class="nav-link " aria-current="page" href="#FAQ">FAQ</a>
+                </li>
+            </ul>
+            </div>
+        </div>
+    </nav>
+    <!--HEADER-->
+    <header class="hero-video">
+        <video autoplay loop muted playsinline class="w-100 bg-video">
+            <source src="videos/111244-690770621.mp4" type="video/mp4">
+            <source src="videos/111244-690770621.mp4" type="video/webm">
+        </video>
+        <div class="hero-content    ">
+            <h1>Explora el universo Gamer</h1>
+            <p>Noticias, Reseñas, Lanzamientos y màs</p>
+            <a href="" class="btn btn-lg">Ver novedades</a>
+        </div>
+    </header>
+    <!--NEWS-->
+    <section id="news" class="bg-dark">
+      <div class="container">
+        <h2 class="section-title ">🗞️Noticias destacadas</h2>
+        <div class="row">
 
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const W = canvas.width, H = canvas.height;
-let keys = {};
-let mouse = {x:0,y:0,down:false};
+          <!--Noticias-->
+          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 text-white border-0">
+              <img src="imagenes/desert-lynx-2603457_640.jpg" class="card-img-top" alt="fornite">
+              <div class="card-body">
+                <h5>Fortnite Lanza nueva temporada</h5>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
+                <a href="#" class="btn btn-outline-light">Leer mas</a>
+              </div>
+            </div>
+          </div>
 
-// Game state
-let gameState = 'playing';
-let score = 0;
+          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 text-white border-0">
+              <img src="imagenes/desert-lynx-4630313_640.jpg" class="card-img-top" alt="fornite">
+              <div class="card-body">
+                <h5>Fortnite Lanza nueva temporada</h5>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
+                <a href="#" class="btn btn-outline-light">Leer mas</a>
+              </div>
+            </div>
+          </div>
 
-// House layout: 3 pisos, cada piso es una franja horizontal
-const floors = 3;
-const floorHeight = Math.floor(H / floors); // from top (floor 3 at top?) We'll number 1 bottom to 3 top
+          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
+            <div class="card h-100 text-white border-0">
+              <img src="imagenes/south-africa-1352255_640.jpg" class="card-img-top" alt="fornite">
+              <div class="card-body">
+                <h5>Fortnite Lanza nueva temporada</h5>
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
+                <a href="#" class="btn btn-outline-light">Leer mas</a>
+              </div>
+            </div>
+          </div>
 
-// Player
-const player = {
-  x: W/2,
-  y: H - floorHeight/2,
-  w: 26,
-  h: 36,
-  speed: 3.8,
-  health: 100,
-  reload: 0,
-  fireRate: 10, // frames
-  dmg: 20,
-  facing: 0,
-  floor: 1
-};
+        </div>
+      </div>
+    </section>
+    <!--Reseñas-->
+    <section id="Resenas" class="bg-dark">
+      <div class="container">
+        <h2 class="section-title">Reseñas Recientes</h2>
+        <div class="row">
+          <div class="col" style="margin-top: 20px;">
+            <div class="card h-100 text-white cardResena">
+              <div class="row ">
+                <div class="col-md-4">
+                  <img src="imagenes/desert-lynx-2603462_640.jpg" alt=""class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                      <h5>titulo</h5>
+                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
+                      <span>⭐⭐⭐⭐⭐(5/5)</span>
+                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-// Enemies array
-let enemies = [];
-let enemyId = 0;
+          <div class="col" style="margin-top: 20px;">
+            <div class="card h-100 text-white cardResena">
+              <div class="row ">
+                <div class="col-md-4">
+                  <img src="imagenes/caracal-819978_640.jpg" alt=""class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                      <h5>titulo</h5>
+                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
+                      <span>⭐⭐⭐⭐⭐(5/5)</span>
+                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
 
-// Bullets
-let bullets = [];
+          <div class="col" style="margin-top: 20px;">
+            <div class="card h-100 text-white cardResena">
+              <div class="row ">
+                <div class="col-md-4">
+                  <img src="imagenes/caracal-7282568_640.jpg" alt=""class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                      <h5>titulo</h5>
+                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
+                      <span>⭐⭐⭐⭐⭐(5/5)</span>
+                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-// Stair positions (x coordinates where you can change floors)
-const stairs = [
-  {x:80,yFloors:[H - floorHeight + 30, H - floorHeight - floorHeight + 30, H - floorHeight - floorHeight*2 + 30]},
-  {x:W - 120,yFloors:[H - floorHeight + 30, H - floorHeight - floorHeight + 30, H - floorHeight - floorHeight*2 + 30]}
-];
+          <div class="col" style="margin-top: 20px;">
+            <div class="card h-100 text-white cardResena">
+              <div class="row ">
+                <div class="col-md-4">
+                  <img src="imagenes/caracal-4336576_640.jpg" alt=""class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                      <h5>titulo</h5>
+                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
+                      <span>⭐⭐⭐⭐⭐(5/5)</span>
+                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!--top juegos-->
+    <section id="ranking" class="text-white bg-dark text-center">
+      <div class="container">
+        <h2>🏆 Top Juegos Populares</h2>
+        <div class="row">
 
-// Spawn enemies per floor
-function initEnemies(){
-  enemies = [];
-  enemyId = 0;
-  const countPerFloor = [3,4,5]; // bottom to top
-  for(let f=1; f<=3; f++){
-    for(let i=0;i<countPerFloor[f-1];i++){
-      spawnEnemy(f);
-    }
-  }
-}
+          <div class="col-md-4 mb-3 ">
+            <div class="card bg-black text-white border-0 h-100 shadow">
+                <img src="imagenes/animals-3013308_640.jpg" class="card-img-top" alt="fornite">
+                <div class="card-body bg-dark">
+                  <h5>#1 Lince1</h5>
+                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
+                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar bg-success" style="width: 98%">98%</div>
+                    </div>
+                  <span class="small text-muted">Popularidad Global</span>
+                </div>
+            </div>
+          </div>
 
-function spawnEnemy(floor){
-  const margin = 140;
-  const yCenter = H - floorHeight*floor + floorHeight/2;
-  const x = margin + Math.random()*(W - margin*2);
-  const y = yCenter + (Math.random()-0.5)*20;
-  const speed = 1 + Math.random()*1.2;
-  const hp = 40 + Math.floor(Math.random()*30);
-  enemies.push({id:enemyId++, x,y,w:26,h:34, floor, speed, hp, maxhp:hp, dir: Math.random()<0.5? -1:1, patrolRange:100 + Math.random()*120, baseX:x, shootTimer: 60 + Math.random()*80});
-}
+          <div class="col-md-4 mb-3">
+            <div class="card bg-black text-white border-0 h-100 shadow">
+                <img src="imagenes/lynx-2482959_640.jpg" class="card-img-top" alt="fornite">
+                <div class="card-body bg-dark">
+                  <h5>#2 Lince2</h5>
+                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
+                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar bg-warning" style="width: 85%">85%</div>
+                    </div>
+                  <span class="small text-muted">Popularidad Global</span>
+                </div>
+            </div>
+          </div>
 
-// Input
-window.addEventListener('keydown', e=>{keys[e.key.toLowerCase()] = true; if(e.key===' '){mouse.down = true;} });
-window.addEventListener('keyup', e=>{keys[e.key.toLowerCase()] = false; if(e.key===' '){mouse.down = false;} });
-canvas.addEventListener('mousemove', e=>{const r=canvas.getBoundingClientRect(); mouse.x=(e.clientX-r.left)*(canvas.width/r.width); mouse.y=(e.clientY-r.top)*(canvas.height/r.height);});
-canvas.addEventListener('mousedown', e=>{mouse.down = true;});
-canvas.addEventListener('mouseup', e=>{mouse.down = false;});
-canvas.addEventListener('touchstart', e=>{const t=e.touches[0];const r=canvas.getBoundingClientRect(); mouse.x=(t.clientX-r.left)*(canvas.width/r.width); mouse.y=(t.clientY-r.top)*(canvas.height/r.height); mouse.down=true;});
-canvas.addEventListener('touchmove', e=>{const t=e.touches[0];const r=canvas.getBoundingClientRect(); mouse.x=(t.clientX-r.left)*(canvas.width/r.width); mouse.y=(t.clientY-r.top)*(canvas.height/r.height);});
-canvas.addEventListener('touchend', e=>{mouse.down=false;});
+          <div class="col-md-4 mb-3">
+            <div class="card bg-black text-white border-0 h-100 shadow">
+                <img src="imagenes/lynx-5204667_640.jpg" class="card-img-top" alt="fornite">
+                <div class="card-body bg-dark">
+                  <h5>#3 Lince3</h5>
+                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
+                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar bg-info" style="width: 72%">72%</div>
+                    </div>
+                  <span class="small text-muted">Popularidad Global</span>
+                </div>
+            </div>
+          </div>
 
-function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+          <div class="col-md-6 mb-3">
+            <div class="card bg-black text-white border-0 h-100 shadow">
+                <img src="imagenes/caracal-7750332_640.jpg" class="card-img-top" alt="fornite">
+                <div class="card-body bg-dark">
+                  <h5>#4 Lince4</h5>
+                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
+                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar bg-danger" style="width: 67%">67%</div>
+                    </div>
+                  <span class="small text-muted">Popularidad Global</span>
+                </div>
+            </div>
+          </div>
 
-// Shooting
-function fireBullet(x,y,tx,ty,owner){
-  const dx = tx - x; const dy = ty - y; const mag = Math.hypot(dx,dy); if(mag===0) return;
-  const vx = dx/mag*8; const vy = dy/mag*8;
-  bullets.push({x,y,vx,vy,owner,life:120});
-}
+          <div class="col-md-6  mb-3">
+            <div class="card bg-black text-white border-0 h-100 shadow">
+                <img src="imagenes/lynx-652356_640.jpg" class="card-img-top" alt="fornite">
+                <div class="card-body bg-dark">
+                  <h5>#5 Lince5</h5>
+                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
+                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                      <div class="progress-bar " style="width: 59%">59%</div>
+                    </div>
+                  <span class="small text-muted">Popularidad Global</span>
+                </div>
+            </div>
+          </div>
 
-// Update
-function update(){
-  if(gameState !== 'playing') return;
+        </div>
+      </div>
+    </section>
+    <!-- Entrevistas-->
+     <section id="entrevistas" class="bg-black text-white">
+      <div class="container ">
+        <h2 class="section-title">🎙️ Entrevistas Exclusivas</h2>
+        <div class="row">
 
-  // player movement
-  const onFloorY = (f)=> H - floorHeight*f + floorHeight/2;
-  let moveX = 0, moveY = 0;
-  if(keys['arrowleft']||keys['a']) moveX = -1;
-  if(keys['arrowright']||keys['d']) moveX = 1;
-  if(keys['arrowup']||keys['w']) moveY = -1;
-  if(keys['arrowdown']||keys['s']) moveY = 1;
-  player.x += moveX * player.speed;
-  player.x = clamp(player.x, 30, W-30);
-  // Allow small vertical adjust inside floor
-  player.y += moveY * player.speed;
-  const targetY = onFloorY(player.floor) + (floorHeight/2 - player.h/2) - 20;
-  player.y = clamp(player.y, targetY - 20, targetY + 20);
+          <div class="col-md-6 ">
+            <div class="card h-100 text-white segundocard mb-2">
+              <div class="row">
+                <div class="col-md-5">
+                    <img src="imagenes/young-lynx-7132789_640.jpg" alt="" class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-7">
+                  <div class="card-body">
+                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
+                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
+                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  // change floors: E subir, Q bajar
-  if(keys['e']){ // subir si cerca de escalera and not top
-    for(const s of stairs){
-      const sx = s.x; const sy = s.yFloors[player.floor-1];
-      if(Math.abs(player.x - sx) < 36){ if(player.floor < 3){ player.floor++; player.y = onFloorY(player.floor); } }
-    }
-    keys['e'] = false; // prevent repeat
-  }
-  if(keys['q']){ // bajar
-    for(const s of stairs){
-      const sx = s.x; const sy = s.yFloors[player.floor-1];
-      if(Math.abs(player.x - sx) < 36){ if(player.floor > 1){ player.floor--; player.y = onFloorY(player.floor); } }
-    }
-    keys['q'] = false;
-  }
+          <div class="col-md-6 ">
+            <div class="card h-100 text-white segundocard mb-2">
+              <div class="row">
+                <div class="col-md-5">
+                    <img src="imagenes/caracal-902444_640.jpg" alt="" class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-7">
+                  <div class="card-body">
+                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
+                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
+                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  // aim
-  player.facing = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+          <div class="col-md-6 ">
+            <div class="card h-100 text-white segundocard mt-2 mb-2">
+              <div class="row">
+                <div class="col-md-5">
+                    <img src="imagenes/caracal-4012455_640.jpg" alt="" class="img-fluid rounded-start">
+                </div>
+                <div class="col-md-7">
+                  <div class="card-body">
+                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
+                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
+                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  // firing
-  if(player.reload > 0) player.reload--; 
-  if(mouse.down && player.reload === 0){ fireBullet(player.x, player.y - player.h/2, mouse.x, mouse.y, 'player'); player.reload = player.fireRate; }
+      </div>
 
-  // update bullets
-  for(let i=bullets.length-1;i>=0;i--){
-    const b = bullets[i];
-    b.x += b.vx; b.y += b.vy; b.life--;
-    // bounds
-    if(b.x < -50 || b.x>W+50 || b.y<-50 || b.y>H+50 || b.life<=0){ bullets.splice(i,1); continue; }
-    // collisions: if owner player, hit enemies same floor
-    if(b.owner==='player'){
-      for(let j=enemies.length-1;j>=0;j--){ const e=enemies[j]; if(e.floor !== player.floor) continue;
-        if(pointInRect(b.x,b.y,e.x - e.w/2, e.y - e.h/2, e.w, e.h)){
-          e.hp -= player.dmg; bullets.splice(i,1); if(e.hp<=0){ enemies.splice(j,1); score++; } break;
-        }
-      }
-    } else { // enemy bullet hits player if same floor
-      if(b.owner && b.owner.type === 'enemy' && b.owner.floor === player.floor){
-        if(pointInRect(b.x,b.y, player.x - player.w/2, player.y - player.h, player.w, player.h + 12)){
-          player.health -= 12; bullets.splice(i,1);
-          if(player.health <=0) gameState='dead';
-        }
-      }
-    }
-  }
+     </section>
+    <!--SUSCRIBETE-->
+    <section id="suscribete" class="text-center bg-dark text-white"> 
+      <h2 class="section-title">🎫Suscribete a nuestro boletín </h2>
+      <div class="row text-center">
+        <p>Recibe novedades, lanzamientos y contenido exclusivo directamente en tu correo.</p>
+      </div>
+      <form action="" class="row justify-content-center">
+        <div class="col-md-6">
+          <input type="email" class="form-control form-control-lg bg-black text-white border-secundary" placeholder="Ingresa tu correo electronico">
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-danger">Enviar</button>
+        </div>
+      </form>
+      <hr class="my-5 border-primary mx-3">
+    </section>
+      <!--opiniones-->
+      <section id="testimonios" class="bg-dark text-white text-center">
+        <h2 class="section-title">💬 Lo que dicen nuestros lectores</h2>
+        <div class="container py-5">
+          <div class="row">
+            <div class="col-md-4 mb-4">
+              <div class="card bg-black text-white border-secondary h-100">
+                <div class="card-body">
+                  <div class="card-text">"Me encanta cómo cubren los torneos de esports. Siempre están actualizados."</div>
+                  <div class="card-subtitle text-muted mt-3">- Camila R. Fan de Valorant</div>
+                </div>
+              </div>
+            </div>
 
-  // update enemies
-  for(const e of enemies){
-    // simple patrol
-    e.baseX += 0; // base static
-    e.x += e.dir * e.speed;
-    if(Math.abs(e.x - e.baseX) > e.patrolRange) e.dir *= -1;
-    // clamp inside margins
-    e.x = clamp(e.x, 40, W-40);
+            <div class="col-md-4 mb-4">
+              <div class="card bg-black text-white border-secondary h-100">
+                <div class="card-body">
+                  <div class="card-text">"Gracias a ustedes no me pierdo ningún partido de LoL. ¡Excelente cobertura!"</div>
+                  <div class="card-subtitle text-muted mt-3">- Javier M. Jugador de LoL</div>
+                </div>
+              </div>
+            </div>
 
-    // line of sight: if player on same floor and within X, aim and shoot occasionally
-    e.shootTimer--;
-    if(e.floor === player.floor){
-      const dx = player.x - e.x; const dy = player.y - e.y; const dist = Math.hypot(dx,dy);
-      if(dist < 380){
-        if(e.shootTimer <=0){
-          // fire
-          const angle = Math.atan2(player.y - e.y, player.x - e.x);
-          bullets.push({x:e.x, y:e.y, vx:Math.cos(angle)*5, vy:Math.sin(angle)*5, owner:{type:'enemy',id:e.id, floor:e.floor}, life:160});
-          e.shootTimer = 80 + Math.random()*80;
-        }
-      }
-    }
-  }
+            <div class="col-md-4 mb-4">
+              <div class="card bg-black text-white border-secondary h-100">
+                <div class="card-body">
+                  <div class="card-text">"Su análisis post-partido es lo mejor. Muy detallado y fácil de entender."</div>
+                  <div class="card-subtitle text-muted mt-3">- Lucía T. Streamer de Dota 2</div>
+                </div>
+              </div>
+            </div>
+          </div> 
+        </div> 
+      <hr class="m-0 border-primary mx-3">
+      </section>
+      <!--FAQ-->
+      <section id="FAQ" class="bg-dark text-white text-center">
+        <h2 class="section-title">❓Preguntas Frecuentes</h2>
+        <div class="container">
+          <div class="accordion accordion-flush bg-black text-white " id="accordionExample">
+          <div class="accordion-item bg-black text-white">
+            <h2 class="accordion-header ">
+              <button class="accordion-button bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                ¿Cadá cuanto publican nuevo contenido?
+              </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <div class="acordion-body">Publicamos nuevo contenido cada que podemos porque si.</div>
+              </div>
+            </div>
+          </div>
 
-  // update HUD
-  document.getElementById('hud').innerText = `Salud: ${Math.max(0,Math.round(player.health))} • Enemigos: ${enemies.length} • Piso: ${player.floor}`;
+          <div class="accordion-item bg-black text-white">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                ¿Puedo colaborar con artículos o reseñas?
+              </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <div class="acordion-body">Para que si sabes que lo vas a hacer mal.</div>
+              </div>
+            </div>
+          </div>
 
-  // win/lose checks
-  if(enemies.length === 0){ gameState = 'win'; }
-}
-
-function pointInRect(px,py,rx,ry,rw,rh){return px>=rx && px<=rx+rw && py>=ry && py<=ry+rh;}
-
-// Draw
-function draw(){
-  // clear
-  ctx.clearRect(0,0,W,H);
-
-  // draw floors
-  for(let f=3; f>=1; f--){
-    const top = H - floorHeight*f;
-    // floor background
-    ctx.fillStyle = f===player.floor ? '#2e2e2e' : '#1f1f1f';
-    ctx.fillRect(0, top, W, floorHeight - 2);
-    // windows / decor
-    ctx.fillStyle = '#2a3b4a';
-    ctx.fillRect(10, top+12, 80, 32);
-    // stairs positions
-    ctx.fillStyle = '#6b5a3a';
-    for(const s of stairs){ ctx.fillRect(s.x - 18, top + floorHeight - 80, 36, 80); }
-    // floor label
-    ctx.fillStyle = '#bbb'; ctx.font = '14px monospace'; ctx.fillText('Piso '+f, 14, top + 24);
-  }
-
-  // draw stairs highlights
-  for(const s of stairs){
-    for(let f=1; f<=3; f++){
-      const sy = H - floorHeight*f + floorHeight - 80;
-      ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(s.x - 18, sy, 36, 80);
-    }
-  }
-
-  // draw player (on its floor)
-  drawEntity(player, true);
-
-  // draw enemies
-  for(const e of enemies){ drawEntity(e, false); drawEnemyHP(e); }
-
-  // bullets
-  for(const b of bullets){ ctx.beginPath(); ctx.arc(b.x,b.y,4,0,Math.PI*2); ctx.fillStyle = '#ffd'; ctx.fill(); }
-
-  // overlays
-  if(gameState === 'win'){
-    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W*0.18, H*0.3, W*0.64, H*0.28);
-    ctx.fillStyle = '#b9ffb9'; ctx.font = '36px monospace'; ctx.fillText('¡Misión cumplida!', W*0.34, H*0.45);
-    ctx.fillStyle = '#fff'; ctx.font = '18px monospace'; ctx.fillText('Presiona R para jugar otra vez', W*0.33, H*0.52);
-  }
-  if(gameState === 'dead'){
-    ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(W*0.18, H*0.3, W*0.64, H*0.28);
-    ctx.fillStyle = '#ff9a9a'; ctx.font = '36px monospace'; ctx.fillText('Has muerto', W*0.38, H*0.45);
-    ctx.fillStyle = '#fff'; ctx.font = '18px monospace'; ctx.fillText('Presiona R para reiniciar', W*0.33, H*0.52);
-  }
-}
-
-function drawEntity(ent, isPlayer){
-  const top = H - floorHeight*ent.floor;
-  // body
-  ctx.save();
-  ctx.translate(ent.x, ent.y);
-  // shadow
-  ctx.beginPath(); ctx.ellipse(0, ent.h/2 + 6, ent.w*0.6, 6, 0,0,Math.PI*2); ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fill();
-  // torso
-  ctx.fillStyle = isPlayer ? '#4ea8f7' : '#c7544a';
-  roundRect(ctx, -ent.w/2, -ent.h, ent.w, ent.h, 6, true, false);
-  // head
-  ctx.beginPath(); ctx.arc(0, -ent.h - 8, 10, 0, Math.PI*2); ctx.fillStyle = '#f1d6b3'; ctx.fill();
-  // weapon: simple rectangle rotated for player
-  ctx.save();
-  if(isPlayer){ ctx.rotate(player.facing); ctx.fillStyle = '#222'; ctx.fillRect(8, -ent.h/2 - 4, 18, 6); }
-  else {
-    // enemy aims a bit towards player when same floor
-    const ang = Math.atan2(player.y - ent.y, player.x - ent.x);
-    ctx.rotate(ang);
-    ctx.fillStyle = '#2b2b2b'; ctx.fillRect(8, -ent.h/2 - 4, 16, 6);
-  }
-  ctx.restore();
-  ctx.restore();
-}
-
-function drawEnemyHP(e){
-  const px = e.x - 24, py = e.y - e.h - 22;
-  ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(px, py, 48, 8);
-  ctx.fillStyle = '#ff6b6b'; ctx.fillRect(px+1, py+1, Math.max(0,46*(e.hp/e.maxhp)), 6);
-}
-
-function roundRect(ctx, x, y, w, h, r, fill, stroke){ if(typeof r==='undefined') r=6; ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); if(fill) ctx.fill(); if(stroke) ctx.stroke(); }
-
-// reset
-function reset(){ player.x = W/2; player.floor = 1; player.y = H - floorHeight/2; player.health = 100; bullets=[]; initEnemies(); gameState='playing'; score=0; }
-
-// helper for key R to restart
-window.addEventListener('keydown', e=>{ if(e.key.toLowerCase() === 'r'){ reset(); } });
-
-// initialize
-initEnemies();
-
-// main loop
-function loop(){ update(); draw(); requestAnimationFrame(loop); }
-loop();
-
-</script>
-</body>
-</html>
-
+          <div class="accordion-item bg-black text-white">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                ¿Como puedo apoyar el blog?
+              </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+              <div class="accordion-body">
+                <div class="acordion-body">Callandote y solo leyendo.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+      <!--Footer-->
+      <footer>
+        <div class="container-fluid bg-black text-white px-5">
+          <div class="row">
+            <div class="col-md-4">
+              <h3 class="text-danger">🎮 Zona Gamer</h3>
+              <p>Explora el universo gamer con noticias, reseñas, rankings, entrevistas y mucho mas. Actualizado semanalmente.</p>
+            </div>
+            <div class="col-md-4">
+              <h3 class="text-light">Navegacion</h3>
+              <ul class="list-unstyled">
+                <li><a href="#news" class="text-decoration-none text-muted">📰Noticias</a></li>
+                <li><a href="#Resenas" class="text-decoration-none text-muted">🎮Reseñas</a></li>
+                <li><a href="#ranking" class="text-decoration-none text-muted">⭐Top juegos</a></li>
+                <li><a href="#entrevistas" class="text-decoration-none text-muted">🎙️Entrevistas</a></li>
+                <li><a href="#FAQ" class="text-decoration-none text-muted">❓FAQ</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h3 class="text-light">Siguenos</h3>
+              <div class="d-flex gap-3">
+                <a href="#" class="text-danger"><i class="bi bi-youtube"></i></a>
+                <a href="#" class="text-warning"><i class="bi bi-twitter"></i></a>
+                <a href="#" class="text-succes"><i class="bi bi-discord"></i></a>
+                <a href="#" class="text-primary"><i class="bi bi-twitch"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <hr class="m-0 border-primary mx-3">
+            <p class="text-center text-muted small py-3 mb-0">&copy; 2025 Zona Gamer. Todos los derechos reservados.</p>
+          </div>
+        </div>
+      </footer>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    </body>
+  </html>
