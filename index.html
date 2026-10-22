@@ -1,460 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto de Álgebra Lineal</title>
+    <style>
+        /* Estilos generales limpios y planos (Fondo Blanco) */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #ffffff;
+            color: #1f2937;
+        }
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Api</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  </head>
-  <body>
-    <!--NAVBAR-->
-    <nav class="navbar navbar-expand-lg fixed-top bg-dark" data-bs-theme="dark">
-        <div class="container-fluid">
-            <a class="navbar-brand fw-bold" href="#">🕹️Videogames</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse justify-contend-end" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#news">News</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link " href="#Resenas">Reseñas</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link " aria-current="page" href="#ranking">Top Juegos</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link " aria-current="page" href="#entrevistas">Entrevistas</a>
-                </li>
-                <li class="nav-item">
-                <a class="nav-link " aria-current="page" href="#suscribete">Suscribite</a>
-                </li>
-                <li class   ="nav-item">
-                <a class="nav-link " aria-current="page" href="#FAQ">FAQ</a>
-                </li>
-            </ul>
+        .contenedor {
+            max-width: 700px;
+            margin: 0 auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background-color: #ffffff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Carátula académica básica */
+        .caratula {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+        }
+
+        .caratula h1 {
+            margin: 0 0 6px 0;
+            font-size: 20px;
+            color: #111827;
+        }
+
+        .caratula p {
+            margin: 2px 0;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        /* Navegación por pestañas */
+        .pestanas {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: #ffffff;
+        }
+
+        .btn-pestana {
+            flex: 1;
+            min-width: 110px;
+            padding: 10px 5px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-pestana:hover {
+            color: #111827;
+            background-color: #f3f4f6;
+        }
+
+        .btn-pestana.activa {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            background-color: #ffffff;
+        }
+
+        /* Secciones */
+        .seccion {
+            display: none;
+            padding: 20px;
+        }
+
+        .seccion.activa {
+            display: block;
+        }
+
+        .seccion h2 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #111827;
+            margin-bottom: 15px;
+        }
+
+        /* Formulario y entradas de texto */
+        .campo {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: #374151;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        .fila-3 {
+            display: flex;
+            gap: 10px;
+        }
+
+        .fila-3 .campo {
+            flex: 1;
+        }
+
+        /* Tablas para matrices */
+        .tabla-matriz {
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .tabla-matriz td {
+            padding: 3px;
+        }
+
+        .tabla-matriz input {
+            width: 55px;
+            text-align: center;
+        }
+
+        /* Botón de cálculo */
+        .btn-calcular {
+            width: 100%;
+            padding: 10px;
+            background-color: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        .btn-calcular:hover {
+            background-color: #1d4ed8;
+        }
+
+        /* Cuadro de resultados */
+        .resultado {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .resultado h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .resultado p {
+            margin: 4px 0;
+            font-size: 13px;
+            color: #374151;
+        }
+
+        .pasos {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #d1d5db;
+            font-family: monospace;
+            font-size: 12px;
+            color: #4b5563;
+        }
+
+        /* Visualización de matrices en resultados */
+        .matriz-res {
+            display: inline-block;
+            border-left: 2px solid #111827;
+            border-right: 2px solid #111827;
+            padding: 0 6px;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+
+        .matriz-res td {
+            padding: 2px 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="contenedor">
+
+    <!-- Carátula Escolar Sencilla -->
+    <div class="caratula">
+        <h1>Proyecto de Álgebra Lineal</h1>
+        <p><strong>Universidad / Curso:</strong> Álgebra Lineal</p>
+        <p><strong>Integrantes:</strong> Estudiante 1, Estudiante 2, Estudiante 3, Estudiante 4, Estudiante 5</p>
+    </div>
+
+    <!-- Pestañas simples -->
+    <div class="pestanas">
+        <button class="btn-pestana activa" onclick="cambiarPestana(event, 'p1')">1. Dirección R³</button>
+        <button class="btn-pestana" onclick="cambiarPestana(event, 'p2')">2. Determinante 3x3</button>
+        <button class="btn-pestana" onclick="cambiarPestana(event, 'p3')">3. Suma Matrices</button>
+        <button class="btn-pestana" onclick="cambiarPestana(event, 'p4')">4. Conjuntos</button>
+        <button class="btn-pestana" onclick="cambiarPestana(event, 'p5')">5. Producto Cruz</button>
+    </div>
+
+    <!-- 1. Dirección en R3 -->
+    <div id="p1" class="seccion activa">
+        <h2>1. Dirección en R³ (Magnitud y Vector Unitario)</h2>
+        <div class="fila-3">
+            <div class="campo">
+                <label>Componente x:</label>
+                <input type="number" id="v1-x" value="3">
+            </div>
+            <div class="campo">
+                <label>Componente y:</label>
+                <input type="number" id="v1-y" value="-4">
+            </div>
+            <div class="campo">
+                <label>Componente z:</label>
+                <input type="number" id="v1-z" value="12">
             </div>
         </div>
-    </nav>
-    <!--HEADER-->
-    <header class="hero-video">
-        <video autoplay loop muted playsinline class="w-100 bg-video">
-            <source src="videos/111244-690770621.mp4" type="video/mp4">
-            <source src="videos/111244-690770621.mp4" type="video/webm">
-        </video>
-        <div class="hero-content    ">
-            <h1>Explora el universo Gamer</h1>
-            <p>Noticias, Reseñas, Lanzamientos y màs</p>
-            <a href="" class="btn btn-lg">Ver novedades</a>
-        </div>
-    </header>
-    <!--NEWS-->
-    <section id="news" class="bg-dark">
-      <div class="container">
-        <h2 class="section-title ">🗞️Noticias destacadas</h2>
-        <div class="row">
 
-          <!--Noticias-->
-          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 text-white border-0">
-              <img src="imagenes/desert-lynx-2603457_640.jpg" class="card-img-top" alt="fornite">
-              <div class="card-body">
-                <h5>Fortnite Lanza nueva temporada</h5>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
-                <a href="#" class="btn btn-outline-light">Leer mas</a>
-              </div>
+        <button class="btn-calcular" onclick="calcDireccion()">Calcular</button>
+        <div id="res-1" class="resultado"></div>
+    </div>
+
+    <!-- 2. Determinante 3x3 -->
+    <div id="p2" class="seccion">
+        <h2>2. Determinante de Matriz 3x3 (Regla de Sarrus)</h2>
+        <table class="tabla-matriz" style="margin: 0 auto 10px auto;">
+            <tr>
+                <td><input type="number" id="m00" value="1"></td>
+                <td><input type="number" id="m01" value="2"></td>
+                <td><input type="number" id="m02" value="3"></td>
+            </tr>
+            <tr>
+                <td><input type="number" id="m10" value="0"></td>
+                <td><input type="number" id="m11" value="1"></td>
+                <td><input type="number" id="m12" value="4"></td>
+            </tr>
+            <tr>
+                <td><input type="number" id="m20" value="5"></td>
+                <td><input type="number" id="m21" value="6"></td>
+                <td><input type="number" id="m22" value="0"></td>
+            </tr>
+        </table>
+
+        <button class="btn-calcular" onclick="calcDeterminante()">Calcular Determinante</button>
+        <div id="res-2" class="resultado"></div>
+    </div>
+
+    <!-- 3. Suma de Matrices 2x2 -->
+    <div id="p3" class="seccion">
+        <h2>3. Suma de Matrices (2x2)</h2>
+        <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
+            <div>
+                <label style="text-align: center;">Matriz A</label>
+                <table class="tabla-matriz">
+                    <tr>
+                        <td><input type="number" id="a00" value="1"></td>
+                        <td><input type="number" id="a01" value="2"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="a10" value="3"></td>
+                        <td><input type="number" id="a11" value="4"></td>
+                    </tr>
+                </table>
             </div>
-          </div>
-
-          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 text-white border-0">
-              <img src="imagenes/desert-lynx-4630313_640.jpg" class="card-img-top" alt="fornite">
-              <div class="card-body">
-                <h5>Fortnite Lanza nueva temporada</h5>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
-                <a href="#" class="btn btn-outline-light">Leer mas</a>
-              </div>
+            <div style="font-size: 20px; align-self: center; font-weight: bold;">+</div>
+            <div>
+                <label style="text-align: center;">Matriz B</label>
+                <table class="tabla-matriz">
+                    <tr>
+                        <td><input type="number" id="b00" value="5"></td>
+                        <td><input type="number" id="b01" value="6"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="number" id="b10" value="7"></td>
+                        <td><input type="number" id="b11" value="8"></td>
+                    </tr>
+                </table>
             </div>
-          </div>
-
-          <div class="col-sm-12 col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 text-white border-0">
-              <img src="imagenes/south-africa-1352255_640.jpg" class="card-img-top" alt="fornite">
-              <div class="card-body">
-                <h5>Fortnite Lanza nueva temporada</h5>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos est sapiente reiciendis repudiandae quo alias! Fugiat quia sit inventore aut, ex perferendis, tempore eveniet vel sint consequuntur ipsam ratione dolorem?</p>
-                <a href="#" class="btn btn-outline-light">Leer mas</a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-    <!--Reseñas-->
-    <section id="Resenas" class="bg-dark">
-      <div class="container">
-        <h2 class="section-title">Reseñas Recientes</h2>
-        <div class="row">
-          <div class="col" style="margin-top: 20px;">
-            <div class="card h-100 text-white cardResena">
-              <div class="row ">
-                <div class="col-md-4">
-                  <img src="imagenes/desert-lynx-2603462_640.jpg" alt=""class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                      <h5>titulo</h5>
-                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
-                      <span>⭐⭐⭐⭐⭐(5/5)</span>
-                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col" style="margin-top: 20px;">
-            <div class="card h-100 text-white cardResena">
-              <div class="row ">
-                <div class="col-md-4">
-                  <img src="imagenes/caracal-819978_640.jpg" alt=""class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                      <h5>titulo</h5>
-                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
-                      <span>⭐⭐⭐⭐⭐(5/5)</span>
-                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-
-          <div class="col" style="margin-top: 20px;">
-            <div class="card h-100 text-white cardResena">
-              <div class="row ">
-                <div class="col-md-4">
-                  <img src="imagenes/caracal-7282568_640.jpg" alt=""class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                      <h5>titulo</h5>
-                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
-                      <span>⭐⭐⭐⭐⭐(5/5)</span>
-                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col" style="margin-top: 20px;">
-            <div class="card h-100 text-white cardResena">
-              <div class="row ">
-                <div class="col-md-4">
-                  <img src="imagenes/caracal-4336576_640.jpg" alt=""class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                      <h5>titulo</h5>
-                      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Iusto quia tempora id culpa voluptatum, vero blanditiis animi vel alias similique sint consequuntur ipsum minus praesentium quam possimus, delectus porro officia.</p>
-                      <span>⭐⭐⭐⭐⭐(5/5)</span>
-                      <a href="" class="btn btn-outline-light">Ver analisis completo</a>
-                    </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!--top juegos-->
-    <section id="ranking" class="text-white bg-dark text-center">
-      <div class="container">
-        <h2>🏆 Top Juegos Populares</h2>
-        <div class="row">
-
-          <div class="col-md-4 mb-3 ">
-            <div class="card bg-black text-white border-0 h-100 shadow">
-                <img src="imagenes/animals-3013308_640.jpg" class="card-img-top" alt="fornite">
-                <div class="card-body bg-dark">
-                  <h5>#1 Lince1</h5>
-                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
-                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                      <div class="progress-bar bg-success" style="width: 98%">98%</div>
-                    </div>
-                  <span class="small text-muted">Popularidad Global</span>
-                </div>
-            </div>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <div class="card bg-black text-white border-0 h-100 shadow">
-                <img src="imagenes/lynx-2482959_640.jpg" class="card-img-top" alt="fornite">
-                <div class="card-body bg-dark">
-                  <h5>#2 Lince2</h5>
-                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
-                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                      <div class="progress-bar bg-warning" style="width: 85%">85%</div>
-                    </div>
-                  <span class="small text-muted">Popularidad Global</span>
-                </div>
-            </div>
-          </div>
-
-          <div class="col-md-4 mb-3">
-            <div class="card bg-black text-white border-0 h-100 shadow">
-                <img src="imagenes/lynx-5204667_640.jpg" class="card-img-top" alt="fornite">
-                <div class="card-body bg-dark">
-                  <h5>#3 Lince3</h5>
-                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
-                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                      <div class="progress-bar bg-info" style="width: 72%">72%</div>
-                    </div>
-                  <span class="small text-muted">Popularidad Global</span>
-                </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 mb-3">
-            <div class="card bg-black text-white border-0 h-100 shadow">
-                <img src="imagenes/caracal-7750332_640.jpg" class="card-img-top" alt="fornite">
-                <div class="card-body bg-dark">
-                  <h5>#4 Lince4</h5>
-                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
-                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                      <div class="progress-bar bg-danger" style="width: 67%">67%</div>
-                    </div>
-                  <span class="small text-muted">Popularidad Global</span>
-                </div>
-            </div>
-          </div>
-
-          <div class="col-md-6  mb-3">
-            <div class="card bg-black text-white border-0 h-100 shadow">
-                <img src="imagenes/lynx-652356_640.jpg" class="card-img-top" alt="fornite">
-                <div class="card-body bg-dark">
-                  <h5>#5 Lince5</h5>
-                  <p class="card-title ">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et sequi quas voluptas repellendus? Ratione pariatur hic ullam eveniet est iusto eos, voluptate voluptatibus, ad quam blanditiis amet aliquid suscipit corrupti.</p>
-                    <div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-                      <div class="progress-bar " style="width: 59%">59%</div>
-                    </div>
-                  <span class="small text-muted">Popularidad Global</span>
-                </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </section>
-    <!-- Entrevistas-->
-     <section id="entrevistas" class="bg-black text-white">
-      <div class="container ">
-        <h2 class="section-title">🎙️ Entrevistas Exclusivas</h2>
-        <div class="row">
-
-          <div class="col-md-6 ">
-            <div class="card h-100 text-white segundocard mb-2">
-              <div class="row">
-                <div class="col-md-5">
-                    <img src="imagenes/young-lynx-7132789_640.jpg" alt="" class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-7">
-                  <div class="card-body">
-                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
-                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
-                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 ">
-            <div class="card h-100 text-white segundocard mb-2">
-              <div class="row">
-                <div class="col-md-5">
-                    <img src="imagenes/caracal-902444_640.jpg" alt="" class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-7">
-                  <div class="card-body">
-                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
-                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
-                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 ">
-            <div class="card h-100 text-white segundocard mt-2 mb-2">
-              <div class="row">
-                <div class="col-md-5">
-                    <img src="imagenes/caracal-4012455_640.jpg" alt="" class="img-fluid rounded-start">
-                </div>
-                <div class="col-md-7">
-                  <div class="card-body">
-                    <h5 class="card-title">Carlos "StreamerKiller" Mendoza</h5>
-                    <p><i>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugiat recusandae nisi ipsum deserunt</i></p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos fugiat dolores modi quasi nostrum qui explicabo</p>
-                    <a href="#" class="btn btn-outline-light">Leer entrevista</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
-      </div>
+        <button class="btn-calcular" onclick="calcSumaMatrices()">Calcular A + B</button>
+        <div id="res-3" class="resultado"></div>
+    </div>
 
-     </section>
-    <!--SUSCRIBETE-->
-    <section id="suscribete" class="text-center bg-dark text-white"> 
-      <h2 class="section-title">🎫Suscribete a nuestro boletín </h2>
-      <div class="row text-center">
-        <p>Recibe novedades, lanzamientos y contenido exclusivo directamente en tu correo.</p>
-      </div>
-      <form action="" class="row justify-content-center">
-        <div class="col-md-6">
-          <input type="email" class="form-control form-control-lg bg-black text-white border-secundary" placeholder="Ingresa tu correo electronico">
+    <!-- 4. Conjuntos -->
+    <div id="p4" class="seccion">
+        <h2>4. Operaciones con Conjuntos</h2>
+        <div class="campo">
+            <label>Conjunto A (elementos separados por coma):</label>
+            <input type="text" id="conj-a" value="1, 2, 3, 4">
         </div>
-        <div class="col-md-2">
-          <button type="submit" class="btn btn-danger">Enviar</button>
+        <div class="campo">
+            <label>Conjunto B (elementos separados por coma):</label>
+            <input type="text" id="conj-b" value="3, 4, 5, 6">
         </div>
-      </form>
-      <hr class="my-5 border-primary mx-3">
-    </section>
-      <!--opiniones-->
-      <section id="testimonios" class="bg-dark text-white text-center">
-        <h2 class="section-title">💬 Lo que dicen nuestros lectores</h2>
-        <div class="container py-5">
-          <div class="row">
-            <div class="col-md-4 mb-4">
-              <div class="card bg-black text-white border-secondary h-100">
-                <div class="card-body">
-                  <div class="card-text">"Me encanta cómo cubren los torneos de esports. Siempre están actualizados."</div>
-                  <div class="card-subtitle text-muted mt-3">- Camila R. Fan de Valorant</div>
-                </div>
-              </div>
-            </div>
 
-            <div class="col-md-4 mb-4">
-              <div class="card bg-black text-white border-secondary h-100">
-                <div class="card-body">
-                  <div class="card-text">"Gracias a ustedes no me pierdo ningún partido de LoL. ¡Excelente cobertura!"</div>
-                  <div class="card-subtitle text-muted mt-3">- Javier M. Jugador de LoL</div>
-                </div>
-              </div>
-            </div>
+        <button class="btn-calcular" onclick="calcConjuntos()">Calcular Operaciones</button>
+        <div id="res-4" class="resultado"></div>
+    </div>
 
-            <div class="col-md-4 mb-4">
-              <div class="card bg-black text-white border-secondary h-100">
-                <div class="card-body">
-                  <div class="card-text">"Su análisis post-partido es lo mejor. Muy detallado y fácil de entender."</div>
-                  <div class="card-subtitle text-muted mt-3">- Lucía T. Streamer de Dota 2</div>
-                </div>
-              </div>
+    <!-- 5. Producto Cruz -->
+    <div id="p5" class="seccion">
+        <h2>5. Producto Cruz en R³ (A × B)</h2>
+        <div class="campo">
+            <label>Vector A (ax, ay, az):</label>
+            <div class="fila-3">
+                <input type="number" id="ax" value="2" placeholder="ax">
+                <input type="number" id="ay" value="3" placeholder="ay">
+                <input type="number" id="az" value="4" placeholder="az">
             </div>
-          </div> 
-        </div> 
-      <hr class="m-0 border-primary mx-3">
-      </section>
-      <!--FAQ-->
-      <section id="FAQ" class="bg-dark text-white text-center">
-        <h2 class="section-title">❓Preguntas Frecuentes</h2>
-        <div class="container">
-          <div class="accordion accordion-flush bg-black text-white " id="accordionExample">
-          <div class="accordion-item bg-black text-white">
-            <h2 class="accordion-header ">
-              <button class="accordion-button bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                ¿Cadá cuanto publican nuevo contenido?
-              </button>
-            </h2>
-            <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <div class="acordion-body">Publicamos nuevo contenido cada que podemos porque si.</div>
-              </div>
+        </div>
+        <div class="campo">
+            <label>Vector B (bx, by, bz):</label>
+            <div class="fila-3">
+                <input type="number" id="bx" value="5" placeholder="bx">
+                <input type="number" id="by" value="6" placeholder="by">
+                <input type="number" id="bz" value="7" placeholder="bz">
             </div>
-          </div>
+        </div>
 
-          <div class="accordion-item bg-black text-white">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                ¿Puedo colaborar con artículos o reseñas?
-              </button>
-            </h2>
-            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <div class="acordion-body">Para que si sabes que lo vas a hacer mal.</div>
-              </div>
-            </div>
-          </div>
+        <button class="btn-calcular" onclick="calcProductoCruz()">Calcular A × B</button>
+        <div id="res-5" class="resultado"></div>
+    </div>
 
-          <div class="accordion-item bg-black text-white">
-            <h2 class="accordion-header">
-              <button class="accordion-button collapsed bg-black text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                ¿Como puedo apoyar el blog?
-              </button>
-            </h2>
-            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-              <div class="accordion-body">
-                <div class="acordion-body">Callandote y solo leyendo.</div>
-              </div>
+</div>
+
+<script>
+    // Cambiar entre pestañas
+    function cambiarPestana(e, idPestana) {
+        var secciones = document.querySelectorAll('.seccion');
+        secciones.forEach(function(sec) { sec.classList.remove('activa'); });
+
+        var botones = document.querySelectorAll('.btn-pestana');
+        botones.forEach(function(btn) { btn.classList.remove('activa'); });
+
+        document.getElementById(idPestana).classList.add('activa');
+        e.currentTarget.classList.add('activa');
+    }
+
+    // 1. Dirección R3
+    function calcDireccion() {
+        var x = parseFloat(document.getElementById('v1-x').value) || 0;
+        var y = parseFloat(document.getElementById('v1-y').value) || 0;
+        var z = parseFloat(document.getElementById('v1-z').value) || 0;
+
+        var magnitud = Math.sqrt(x*x + y*y + z*z);
+        var res = document.getElementById('res-1');
+        res.style.display = 'block';
+
+        if (magnitud === 0) {
+            res.innerHTML = "<h3>Resultado:</h3><p>El vector es nulo (0,0,0) y no tiene dirección.</p>";
+            return;
+        }
+
+        var ux = (x / magnitud).toFixed(4);
+        var uy = (y / magnitud).toFixed(4);
+        var uz = (z / magnitud).toFixed(4);
+
+        res.innerHTML = `
+            <h3>Resultado:</h3>
+            <p><strong>Magnitud |v|:</strong> √(${x}² + ${y}² + ${z}²) = <strong>${magnitud.toFixed(4)}</strong></p>
+            <p><strong>Vector Unitario (u = v / |v|):</strong> (${ux}, ${uy}, ${uz})</p>
+        `;
+    }
+
+    // 2. Determinantes 3x3
+    function calcDeterminante() {
+        var m00 = parseFloat(document.getElementById('m00').value) || 0;
+        var m01 = parseFloat(document.getElementById('m01').value) || 0;
+        var m02 = parseFloat(document.getElementById('m02').value) || 0;
+        var m10 = parseFloat(document.getElementById('m10').value) || 0;
+        var m11 = parseFloat(document.getElementById('m11').value) || 0;
+        var m12 = parseFloat(document.getElementById('m12').value) || 0;
+        var m20 = parseFloat(document.getElementById('m20').value) || 0;
+        var m21 = parseFloat(document.getElementById('m21').value) || 0;
+        var m22 = parseFloat(document.getElementById('m22').value) || 0;
+
+        // Productos de la Regla de Sarrus
+        var p1 = m00 * m11 * m22;
+        var p2 = m01 * m12 * m20;
+        var p3 = m02 * m10 * m21;
+        var sumaPos = p1 + p2 + p3;
+
+        var n1 = m02 * m11 * m20;
+        var n2 = m00 * m12 * m21;
+        var n3 = m01 * m10 * m22;
+        var sumaNeg = n1 + n2 + n3;
+
+        var det = sumaPos - sumaNeg;
+
+        var res = document.getElementById('res-2');
+        res.style.display = 'block';
+        res.innerHTML = `
+            <h3>Resultado:</h3>
+            <p><strong>Determinante det(A):</strong> <strong>${det}</strong></p>
+            <div class="pasos">
+                <strong>Procedimiento (Sarrus):</strong><br>
+                Diagonales principales: (${p1}) + (${p2}) + (${p3}) = ${sumaPos}<br>
+                Diagonales secundarias: (${n1}) + (${n2}) + (${n3}) = ${sumaNeg}<br>
+                det(A) = ${sumaPos} - (${sumaNeg}) = ${det}
             </div>
-          </div>
-        </div>
-        </div>
-      </section>
-      <!--Footer-->
-      <footer>
-        <div class="container-fluid bg-black text-white px-5">
-          <div class="row">
-            <div class="col-md-4">
-              <h3 class="text-danger">🎮 Zona Gamer</h3>
-              <p>Explora el universo gamer con noticias, reseñas, rankings, entrevistas y mucho mas. Actualizado semanalmente.</p>
+        `;
+    }
+
+    // 3. Suma Matrices 2x2
+    function calcSumaMatrices() {
+        var a00 = parseFloat(document.getElementById('a00').value) || 0;
+        var a01 = parseFloat(document.getElementById('a01').value) || 0;
+        var a10 = parseFloat(document.getElementById('a10').value) || 0;
+        var a11 = parseFloat(document.getElementById('a11').value) || 0;
+
+        var b00 = parseFloat(document.getElementById('b00').value) || 0;
+        var b01 = parseFloat(document.getElementById('b01').value) || 0;
+        var b10 = parseFloat(document.getElementById('b10').value) || 0;
+        var b11 = parseFloat(document.getElementById('b11').value) || 0;
+
+        var r00 = a00 + b00;
+        var r01 = a01 + b01;
+        var r10 = a10 + b10;
+        var r11 = a11 + b11;
+
+        var res = document.getElementById('res-3');
+        res.style.display = 'block';
+        res.innerHTML = `
+            <h3>Resultado (A + B):</h3>
+            <table class="matriz-res">
+                <tr><td>${r00}</td><td>${r01}</td></tr>
+                <tr><td>${r10}</td><td>${r11}</td></tr>
+            </table>
+        `;
+    }
+
+    // 4. Conjuntos
+    function calcConjuntos() {
+        var strA = document.getElementById('conj-a').value;
+        var strB = document.getElementById('conj-b').value;
+
+        var arrA = strA.split(',').map(function(item) { return item.trim(); }).filter(Boolean);
+        var arrB = strB.split(',').map(function(item) { return item.trim(); }).filter(Boolean);
+
+        // Unión
+        var union = Array.from(new Set(arrA.concat(arrB)));
+
+        // Intersección
+        var inter = arrA.filter(function(x) { return arrB.includes(x); });
+        inter = Array.from(new Set(inter));
+
+        // Diferencia (A - B)
+        var dif = arrA.filter(function(x) { return !arrB.includes(x); });
+        dif = Array.from(new Set(dif));
+
+        var res = document.getElementById('res-4');
+        res.style.display = 'block';
+        res.innerHTML = `
+            <h3>Resultados:</h3>
+            <p><strong>Unión (A ∪ B):</strong> { ${union.join(', ')} }</p>
+            <p><strong>Intersección (A ∩ B):</strong> { ${inter.length > 0 ? inter.join(', ') : '∅'} }</p>
+            <p><strong>Diferencia (A - B):</strong> { ${dif.length > 0 ? dif.join(', ') : '∅'} }</p>
+        `;
+    }
+
+    // 5. Producto Cruz
+    function calcProductoCruz() {
+        var ax = parseFloat(document.getElementById('ax').value) || 0;
+        var ay = parseFloat(document.getElementById('ay').value) || 0;
+        var az = parseFloat(document.getElementById('az').value) || 0;
+
+        var bx = parseFloat(document.getElementById('bx').value) || 0;
+        var by = parseFloat(document.getElementById('by').value) || 0;
+        var bz = parseFloat(document.getElementById('bz').value) || 0;
+
+        var rx = (ay * bz) - (az * by);
+        var ry = (az * bx) - (ax * bz);
+        var rz = (ax * by) - (ay * bx);
+
+        var res = document.getElementById('res-5');
+        res.style.display = 'block';
+        res.innerHTML = `
+            <h3>Resultado (A × B):</h3>
+            <p><strong>Vector Resultante:</strong> (${rx}, ${ry}, ${rz})</p>
+            <div class="pasos">
+                i: (${ay}×${bz}) - (${az}×${by}) = ${rx}<br>
+                j: (${az}×${bx}) - (${ax}×${bz}) = ${ry}<br>
+                k: (${ax}×${by}) - (${ay}×${bx}) = ${rz}
             </div>
-            <div class="col-md-4">
-              <h3 class="text-light">Navegacion</h3>
-              <ul class="list-unstyled">
-                <li><a href="#news" class="text-decoration-none text-muted">📰Noticias</a></li>
-                <li><a href="#Resenas" class="text-decoration-none text-muted">🎮Reseñas</a></li>
-                <li><a href="#ranking" class="text-decoration-none text-muted">⭐Top juegos</a></li>
-                <li><a href="#entrevistas" class="text-decoration-none text-muted">🎙️Entrevistas</a></li>
-                <li><a href="#FAQ" class="text-decoration-none text-muted">❓FAQ</a></li>
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <h3 class="text-light">Siguenos</h3>
-              <div class="d-flex gap-3">
-                <a href="#" class="text-danger"><i class="bi bi-youtube"></i></a>
-                <a href="#" class="text-warning"><i class="bi bi-twitter"></i></a>
-                <a href="#" class="text-succes"><i class="bi bi-discord"></i></a>
-                <a href="#" class="text-primary"><i class="bi bi-twitch"></i></a>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <hr class="m-0 border-primary mx-3">
-            <p class="text-center text-muted small py-3 mb-0">&copy; 2025 Zona Gamer. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    </body>
-  </html>
+        `;
+    }
+</script>
+
+</body>
+</html>
